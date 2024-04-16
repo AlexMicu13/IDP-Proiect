@@ -1,0 +1,26 @@
+version: '3'
+
+services:
+  postgres:
+    image: postgres
+    restart: always
+    environment:
+      POSTGRES_USER: your_username
+      POSTGRES_PASSWORD: your_password
+      POSTGRES_DB: your_database_name
+    volumes:
+      - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql
+
+  io_service:
+    build: ./io/
+    restart: always
+    depends_on:
+      - postgres
+
+  flask_service:
+    build: ./backend/
+    restart: always
+    depends_on:
+      - io_service
+    ports:
+      - "5000:80" # Change 5000 to any desired port number
