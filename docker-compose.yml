@@ -33,3 +33,11 @@ services:
       - io_service
     ports:
       - "5000:80" # Change 5000 to any desired port number
+
+  auth:
+    build: ./auth/
+    restart: always
+    depends_on:
+      - io_service
+    ports:
+      - "5001:80" # Change 5000 to any desired port number
