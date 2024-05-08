@@ -55,3 +55,7 @@ services:
       - name: api-slots
         paths: 
           - /api/available-slots
+
+
+plugins:
+  - name: prometheus
