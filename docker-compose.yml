@@ -1,4 +1,4 @@
-version: '3'
+version: '3.7'
 
 services:
   portainer:
@@ -9,6 +9,14 @@ services:
     volumes:
       - data:/data
       - /var/run/docker.sock:/var/run/docker.sock
+    deploy:
+      replicas: 1
+      resources:
+        limits:
+          cpus: "0.2"
+          memory: 50M
+      restart_policy:
+        condition: on-failure
 
   postgres:
     image: postgres
@@ -19,12 +27,31 @@ services:
       POSTGRES_DB: your_database_name
     volumes:
       - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql
+    deploy:
+      replicas: 1
+      resources:
+        limits:
+          cpus: "0.2"
+          memory: 50M
+      restart_policy:
+        condition: on-failure
 
   io_service:
-    build: ./io/
+    image: io-service
+    build:
+      context: ./io/
+      dockerfile: Dockerfile
     restart: always
     depends_on:
       - postgres
+    deploy:
+      replicas: 1
+      resources:
+        limits:
+          cpus: "0.2"
+          memory: 50M
+      restart_policy:
+        condition: on-failure
 
   pgadmin:
     image: dpage/pgadmin4
@@ -34,22 +61,52 @@ services:
       PGADMIN_DEFAULT_PASSWORD: your_password
     ports:
       - "5050:80" # Change 5050 to any desired port number
+    deploy:
+      replicas: 1
+      resources:
+        limits:
+          cpus: "0.2"
+          memory: 50M
+      restart_policy:
+        condition: on-failure
 
   flask_service:
-    build: ./backend/
+    image: flask-service
+    build:
+      context: ./backend/
+      dockerfile: Dockerfile
     restart: always
     depends_on:
       - io_service
     ports:
       - "5000:80" # Change 5000 to any desired port number
+    deploy:
+      replicas: 4
+      resources:
+        limits:
+          cpus: "0.2"
+          memory: 50M
+      restart_policy:
+        condition: on-failure
 
   auth:
-    build: ./auth/
+    image: auth-service
+    build:
+      context: ./auth/
+      dockerfile: Dockerfile
     restart: always
     depends_on:
       - io_service
     ports:
       - "5001:80" # Change 5000 to any desired port number
+    deploy:
+      replicas: 2
+      resources:
+        limits:
+          cpus: "0.2"
+          memory: 50M
+      restart_policy:
+        condition: on-failure
 
 volumes:
   data:
