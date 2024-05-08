@@ -1,0 +1,57 @@
+_format_version: "2.1"
+
+services:
+  - name: auth-service-test
+    url: http://auth-service:80
+    routes:
+      - name: auth-test
+        paths: 
+          - /auth/test
+  - name: auth-service-login
+    url: http://auth-service:80/login
+    routes:
+      - name: auth-login
+        paths: 
+          - /auth/login
+  - name: auth-service-register
+    url: http://auth-service:80/register
+    routes:
+      - name: auth-register
+        paths: 
+          - /auth/register
+  - name: auth-service-logout
+    url: http://auth-service:80/logout
+    routes:
+      - name: auth-logout
+        paths: 
+          - /auth/logout
+  - name: api-service-workspace
+    url: http://flask-service:80/workspace
+    routes:
+      - name: api-workspace
+        paths: 
+          - /api/workspace
+  - name: api-service-workspaces
+    url: http://flask-service:80/workspaces
+    routes:
+      - name: api-workspaces
+        paths: 
+          - /api/workspaces
+  - name: api-service-reservation
+    url: http://flask-service:80/reservation
+    routes:
+      - name: api-reservation
+        paths: 
+          - /api/reservation
+  - name: api-service-reservations
+    url: http://flask-service:80/reservations
+    routes:
+      - name: api-reservations
+        paths: 
+          - /api/reservations
+  - name: api-service-slots
+    url: http://flask-service:80/available-slots
+    routes:
+      - name: api-slots
+        paths: 
+          - /api/available-slots

@@ -9,6 +9,8 @@ services:
     volumes:
       - data:/data
       - /var/run/docker.sock:/var/run/docker.sock
+    networks:
+      - internal
     deploy:
       replicas: 1
       resources:
@@ -27,12 +29,14 @@ services:
       POSTGRES_DB: your_database_name
     volumes:
       - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - internal
+      - db
     deploy:
       replicas: 1
-      resources:
-        limits:
-          cpus: "0.2"
-          memory: 50M
+      placement:
+        constraints:
+          - "node.role==manager"
       restart_policy:
         condition: on-failure
 
@@ -42,6 +46,11 @@ services:
       context: ./io/
       dockerfile: Dockerfile
     restart: always
+    networks:
+      - internal
+      - db
+      - db-auth
+      - db-backend
     depends_on:
       - postgres
     deploy:
@@ -61,6 +70,9 @@ services:
       PGADMIN_DEFAULT_PASSWORD: your_password
     ports:
       - "5050:80" # Change 5050 to any desired port number
+    networks:
+      - internal
+      - db
     deploy:
       replicas: 1
       resources:
@@ -70,7 +82,7 @@ services:
       restart_policy:
         condition: on-failure
 
-  flask_service:
+  flask-service:
     image: flask-service
     build:
       context: ./backend/
@@ -80,6 +92,9 @@ services:
       - io_service
     ports:
       - "5000:80" # Change 5000 to any desired port number
+    networks:
+      - internal
+      - db-backend
     deploy:
       replicas: 4
       resources:
@@ -89,7 +104,7 @@ services:
       restart_policy:
         condition: on-failure
 
-  auth:
+  auth-service:
     image: auth-service
     build:
       context: ./auth/
@@ -97,6 +112,9 @@ services:
     restart: always
     depends_on:
       - io_service
+    networks:
+      - internal
+      - db-auth
     ports:
       - "5001:80" # Change 5000 to any desired port number
     deploy:
@@ -108,5 +126,34 @@ services:
       restart_policy:
         condition: on-failure
 
+  kong:
+      image: kong:latest
+      volumes:
+        - ./kong:/usr/local/kong/declarative
+      environment:
+        KONG_DATABASE: 'off'
+        KONG_DECLARATIVE_CONFIG: /usr/local/kong/declarative/kong.yml
+        KONG_PROXY_ACCESS_LOG: /dev/stdout
+        KONG_ADMIN_ACCESS_LOG: /dev/stdout
+        KONG_PROXY_ERROR_LOG: /dev/stderr
+        KONG_ADMIN_ERROR_LOG: /dev/stderr
+        KONG_ADMIN_LISTEN: 0.0.0.0:8001, 0.0.0.0:8444 ssl
+      ports:
+        - 80:8000
+        - 443:8443
+        - 8001:8001
+        - 8444:8444
+      deploy:
+        placement:
+            constraints: [node.role == manager]
+      networks:
+        - internal
+
 volumes:
   data:
+
+networks:
+  internal:
+  db:
+  db-auth:
+  db-backend:

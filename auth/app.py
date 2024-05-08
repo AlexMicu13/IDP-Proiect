@@ -16,6 +16,10 @@ def connect_to_db():
 def generate_token():
     return ''.join(random.choices(string.ascii_letters + string.digits, k=32))
 
+@app.route('/', methods=['GET'])
+def def_route():
+    return jsonify({'message': 'successfully'}), 201
+
 # Route for user registration
 @app.route('/register', methods=['POST'])
 def register_user():
