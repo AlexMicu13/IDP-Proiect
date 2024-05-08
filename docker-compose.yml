@@ -1,6 +1,15 @@
 version: '3'
 
 services:
+  portainer:
+    image: portainer/portainer-ce:latest
+    restart: unless-stopped
+    ports:
+      - "9443:9443"
+    volumes:
+      - data:/data
+      - /var/run/docker.sock:/var/run/docker.sock
+
   postgres:
     image: postgres
     restart: always
@@ -41,3 +50,6 @@ services:
       - io_service
     ports:
       - "5001:80" # Change 5000 to any desired port number
+
+volumes:
+  data:
