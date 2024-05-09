@@ -1,6 +1,8 @@
 from flask import Flask, request, jsonify
 import psycopg2
 from datetime import datetime
+import string
+from functools import wraps
 
 app = Flask(__name__)
 
@@ -14,8 +16,40 @@ def connect_to_db():
     )
     return conn
 
+def token_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        token = request.headers.get('Authorization')
+
+        if not token:
+            return jsonify({'error': 'Missing token'}), 401
+
+        try:
+            conn = connect_to_db()
+            cur = conn.cursor()
+
+            cur.execute("SELECT * FROM Users WHERE token = %s", (token,))
+            user = cur.fetchone()
+
+            if not user:
+                return jsonify({'error': 'Invalid or expired token'}), 401
+
+            # Store user info in request context for use in the route if needed
+            request.user = user
+
+            return f(*args, **kwargs)
+        except psycopg2.Error as e:
+            return jsonify({'error': str(e)}), 500
+        finally:
+            cur.close()
+            conn.close()
+
+    return decorated_function
+
+
 # Route for creating a new workspace
 @app.route('/workspace', methods=['POST'])
+@token_required
 def create_workspace():
     data = request.json
     workspace_name = data.get('workspace_name')
@@ -45,6 +79,7 @@ def create_workspace():
 
 # Route for deleting a workspace
 @app.route('/workspace/<int:workspace_id>', methods=['DELETE'])
+@token_required
 def delete_workspace(workspace_id):
     try:
         conn = connect_to_db()
@@ -69,6 +104,7 @@ def delete_workspace(workspace_id):
 
 # Route for listing all workspaces
 @app.route('/workspaces', methods=['GET'])
+@token_required
 def list_workspaces():
     try:
         conn = connect_to_db()
@@ -99,6 +135,7 @@ def list_workspaces():
 
 # Route for making a new reservation
 @app.route('/reservation', methods=['POST'])
+@token_required
 def make_reservation():
     data = request.json
     user_id = data.get('user_id')
@@ -137,6 +174,7 @@ def make_reservation():
 
 # Route for checking available time slots for a workspace
 @app.route('/available-slots/<int:workspace_id>', methods=['GET'])
+@token_required
 def check_available_slots(workspace_id):
     try:
         conn = connect_to_db()
@@ -169,6 +207,7 @@ def check_available_slots(workspace_id):
 
 # Route for listing all reservations for a user
 @app.route('/reservations/<int:user_id>', methods=['GET'])
+@token_required
 def list_reservations(user_id):
     try:
         conn = connect_to_db()
@@ -201,6 +240,7 @@ def list_reservations(user_id):
 
 # Route for deleting a reservation
 @app.route('/reservation/<int:reservation_id>', methods=['DELETE'])
+@token_required
 def delete_reservation(reservation_id):
     try:
         conn = connect_to_db()
@@ -224,6 +264,7 @@ def delete_reservation(reservation_id):
         conn.close()
 
 @app.route('/')
+@token_required
 def hello_world():
     conn = psycopg2.connect(dbname="your_database_name", user="your_username", password="your_password", host="postgres")
     cur = conn.cursor()
