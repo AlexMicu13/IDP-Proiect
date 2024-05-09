@@ -46,6 +46,8 @@ services:
       context: ./io/
       dockerfile: Dockerfile
     restart: always
+    ports:
+      - "5002:80" # Change 5000 to any desired port number
     networks:
       - internal
       - db
