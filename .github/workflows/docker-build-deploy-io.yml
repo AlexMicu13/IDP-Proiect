@@ -13,6 +13,9 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Docker Build and Push
+        env:
+          CI_REGISTRY_USER: ${{ secrets.CI_REGISTRY_USER }}
+          CI_REGISTRY_PASSWORD: ${{ secrets.CI_REGISTRY_PASSWORD }}
         run: |
           docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD"
           docker build --pull -t stefanjumarea/idp-io -f io/Dockerfile io
