@@ -30,4 +30,4 @@ jobs:
 
       - name: Deploy Service
         run: |
-          curl -XPOST https://localhost:9443/api/webhooks/39b85db2-17de-4378-8749-79bef6024971
+          curl -XPOST https://host.docker.internal:9443/api/webhooks/39b85db2-17de-4378-8749-79bef6024971
