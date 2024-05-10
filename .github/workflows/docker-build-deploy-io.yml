@@ -15,7 +15,7 @@ jobs:
       - name: Docker Build and Push
         run: |
           docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD"
-          docker build --pull -t stefanjumarea/idp-io .
+          docker build --pull -t stefanjumarea/idp-io -f io/Dockerfile .
           docker push stefanjumarea/idp-io
 
   deploy:
