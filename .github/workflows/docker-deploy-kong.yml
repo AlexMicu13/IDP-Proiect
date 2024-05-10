@@ -1,0 +1,32 @@
+name: Docker Deploy
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+
+      - name: Docker Push
+        env:
+          CI_REGISTRY_USER: ${{ secrets.CI_REGISTRY_USER }}
+          CI_REGISTRY_PASSWORD: ${{ secrets.CI_REGISTRY_PASSWORD }}
+        run: |
+          docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD"
+          docker push stefanjumarea/idp-kong
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Install curl
+        run: sudo apt-get update && sudo apt-get install -y curl
+
+      - name: Deploy Service
+        run: |
+          curl -k -XPOST https://ip172-18-0-77-cov4fv0l2o90008hoh30-9443.direct.labs.play-with-docker.com/api/webhooks/9b9d02ae-7194-4e50-83e5-fb33adaa8055
