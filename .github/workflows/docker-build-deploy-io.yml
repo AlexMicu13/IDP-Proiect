@@ -30,4 +30,4 @@ jobs:
 
       - name: Deploy Service
         run: |
-          curl -k -XPOST https://ip172-18-0-77-cov4fv0l2o90008hoh30-9443.direct.labs.play-with-docker.com/api/webhooks/26c228a9-e2ef-434c-bcfd-aa0b4fc867b9
+          curl -k -XPOST https://ip172-18-0-77-cov4fv0l2o90008hoh30-9443.direct.labs.play-with-docker.com/api/webhooks/a3f1dd34-ec69-40a4-a558-f56042dbb022
