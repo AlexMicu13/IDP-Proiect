@@ -1,0 +1,986 @@
+{
+	"info": {
+		"_postman_id": "d458073f-8dfb-4910-a53b-03e216b90e9e",
+		"name": "IDP proiect",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "31060986"
+	},
+	"item": [
+		{
+			"name": "Add user",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"let initialized = pm.variables.get(\"ADD_USER_INIT\");\r",
+							"console.log(initialized);\r",
+							"if (!initialized) {\r",
+							"    const users = [\r",
+							"        {\r",
+							"            \"username\": \"firstIDPuser\",\r",
+							"            \"email\": \"firstuser@mail.com\",\r",
+							"            \"password\": \"IDPpassword\"\r",
+							"        },\r",
+							"        {\r",
+							"            \"username\": \"secondIDPuser\",\r",
+							"            \"email\": \"seconduser@mail.com\",\r",
+							"            \"password\": \"IDPpassword\"\r",
+							"        },\r",
+							"        {\r",
+							"            \"token\": \"ajfshgaf\"\r",
+							"        }\r",
+							"    ];\r",
+							"    initialized = true;\r",
+							"    pm.variables.set(\"ADD_USER_INIT\", initialized);\r",
+							"    pm.collectionVariables.set(\"USERS_IDS\", JSON.stringify([]));\r",
+							"    pm.variables.set(\"ADD_USER_DATASET\", JSON.stringify(users));\r",
+							"}\r",
+							"\r",
+							"const dataset = JSON.parse(pm.variables.get(\"ADD_USER_DATASET\"));\r",
+							"const currentUser = dataset.shift();\r",
+							"console.log(currentUser);\r",
+							"console.log(dataset);\r",
+							"pm.variables.set(\"CURRENT_USER\", JSON.stringify(currentUser));\r",
+							"pm.variables.set(\"ADD_USER_DATASET\", JSON.stringify(dataset));\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// No changes needed for the response time test",
+							"const schema = {",
+							"  type: 'object',",
+							"  minItems: 1,",
+							"  maxItems: 1,",
+							"  properties: {",
+							"    message: { type: 'string' },",
+							"    user_id: { type: 'number' }",
+							"  },",
+							"  additionalProperties: false",
+							"};",
+							"",
+							"pm.test(\"Response should either be 201 and have id, or 500 or 400\", () => {",
+							"    pm.expect(pm.response.code).to.be.oneOf([201, 400, 500]);",
+							"    const status = pm.response.code;",
+							"",
+							"    if (status === 201) {",
+							"",
+							"      //  pm.expect(pm.response.headers.get('Content-Type').split(';')[0]).to.eql('application/json');",
+							"        pm.response.to.have.jsonSchema(schema);",
+							"        ",
+							"        const resultId = pm.response.json().user_id;",
+							"        const usersIds = JSON.parse(pm.collectionVariables.get(\"USERS_IDS\"));",
+							"        usersIds.push(resultId);",
+							"        pm.collectionVariables.set(\"USERS_IDS\", JSON.stringify(usersIds));",
+							"        const user = JSON.parse(pm.variables.get(\"CURRENT_USER\"));",
+							"        const userStruct = {",
+							"            user_id: pm.response.json().user_id,",
+							"            username: user.username,",
+							"            token: null",
+							"        };",
+							"        console.log(userStruct)",
+							"        const userArray = JSON.parse(pm.collectionVariables.get(\"USERS_ARRAY\") || \"[]\");",
+							"        userArray.push(userStruct);",
+							"        pm.collectionVariables.set(\"USERS_ARRAY\", JSON.stringify(userArray));",
+							"    }",
+							"",
+							"    const dataset = JSON.parse(pm.variables.get(\"ADD_USER_DATASET\"));",
+							"    console.log(dataset);",
+							"    console.log(dataset.length);",
+							"    if (dataset.length > 0) {",
+							"        pm.execution.setNextRequest(\"Add user\");",
+							"    } ",
+							"});",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{{CURRENT_USER}}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://172.27.209.195:80/auth/register",
+					"protocol": "http",
+					"host": [
+						"172",
+						"27",
+						"209",
+						"195"
+					],
+					"port": "80",
+					"path": [
+						"auth",
+						"register"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get users",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"const schema = {\r",
+							"    type: 'array',\r",
+							"    uniqueItems: true,\r",
+							"    minItems: 0,\r",
+							"    items: {\r",
+							"        type: 'object',\r",
+							"        properties: {\r",
+							"            user_id: { type: 'number' },\r",
+							"            username: { type: 'string' },\r",
+							"            email: { type: 'string' },\r",
+							"            token: { oneOf: [{ type: 'string' }, { type: 'null' }] }\r",
+							"        },\r",
+							"        additionalProperties: false\r",
+							"    }\r",
+							"};\r",
+							"\r",
+							"const usersIds = JSON.parse(pm.collectionVariables.get(\"USERS_IDS\") || \"[]\");\r",
+							"\r",
+							"pm.test(\"Body should either be empty or respect the schema\", () => {\r",
+							"    pm.response.to.have.status(200);\r",
+							"    const responseJSON = pm.response.json();\r",
+							"    pm.expect(responseJSON).to.be.an(\"array\");\r",
+							"    pm.expect(responseJSON.length).to.eql(usersIds.length);\r",
+							"\r",
+							"    pm.response.to.have.jsonSchema(schema);\r",
+							"    responseJSON.forEach(e => {\r",
+							"        pm.expect(usersIds.indexOf(e.user_id)).to.not.eql(-1);\r",
+							"    });\r",
+							"\r",
+							"    console.log(pm.response.json());\r",
+							"    console.log(\"Users ids are: \");\r",
+							"    console.log(usersIds);\r",
+							"});\r",
+							"\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://172.27.209.195:80/auth/users",
+					"protocol": "http",
+					"host": [
+						"172",
+						"27",
+						"209",
+						"195"
+					],
+					"port": "80",
+					"path": [
+						"auth",
+						"users"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Login user",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"const schema = {\r",
+							"  type: 'object',\r",
+							"  minItems: 1,\r",
+							"  maxItems: 1,\r",
+							"  properties: {\r",
+							"    token: { type: 'string' }\r",
+							"  },\r",
+							"  additionalProperties: false\r",
+							"};\r",
+							"\r",
+							"pm.test(\"Response should either be 200 and have token, or 401 or 400\", () => {\r",
+							"    pm.expect(pm.response.code).to.be.oneOf([200, 400, 401]);\r",
+							"    const status = pm.response.code;\r",
+							"\r",
+							"    if (status === 200) {\r",
+							"\r",
+							"      //  pm.expect(pm.response.headers.get('Content-Type').split(';')[0]).to.eql('application/json');\r",
+							"        pm.response.to.have.jsonSchema(schema);\r",
+							"        console.log(pm.response.json());\r",
+							"        let usersArray = JSON.parse(pm.collectionVariables.get(\"USERS_ARRAY\"));\r",
+							"        let token = pm.response.json().token;\r",
+							"        const bodyJson = JSON.parse(pm.request.body);\r",
+							"        const usernameFromRequest = bodyJson.username;\r",
+							"        const userIndex = usersArray.findIndex(user => user.username === usernameFromRequest);\r",
+							"        pm.expect(userIndex).to.not.equal(-1, \"User with matching username not found in USERS_ARRAY\");\r",
+							"        usersArray[userIndex].token = token;\r",
+							"        pm.collectionVariables.set(\"USERS_ARRAY\", JSON.stringify(usersArray));\r",
+							"        pm.collectionVariables.set(\"TOKEN\", token);\r",
+							"    }\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"username\": \"secondIDPuser\",\r\n    \"password\": \"IDPpassword\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://172.27.209.195:80/auth/login",
+					"protocol": "http",
+					"host": [
+						"172",
+						"27",
+						"209",
+						"195"
+					],
+					"port": "80",
+					"path": [
+						"auth",
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get users",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"const schema = {\r",
+							"    type: 'array',\r",
+							"    uniqueItems: true,\r",
+							"    minItems: 0,\r",
+							"    items: {\r",
+							"        type: 'object',\r",
+							"        properties: {\r",
+							"            user_id: { type: 'number' },\r",
+							"            username: { type: 'string' },\r",
+							"            email: { type: 'string' },\r",
+							"            token: { oneOf: [{ type: 'string' }, { type: 'null' }] }\r",
+							"        },\r",
+							"        additionalProperties: false\r",
+							"    }\r",
+							"};\r",
+							"\r",
+							"const usersIds = JSON.parse(pm.collectionVariables.get(\"USERS_IDS\") || \"[]\");\r",
+							"\r",
+							"pm.test(\"Body should either be empty or respect the schema\", () => {\r",
+							"    pm.response.to.have.status(200);\r",
+							"    const responseJSON = pm.response.json();\r",
+							"    pm.expect(responseJSON).to.be.an(\"array\");\r",
+							"    pm.expect(responseJSON.length).to.eql(usersIds.length);\r",
+							"\r",
+							"    pm.response.to.have.jsonSchema(schema);\r",
+							"    responseJSON.forEach(e => {\r",
+							"        pm.expect(usersIds.indexOf(e.user_id)).to.not.eql(-1);\r",
+							"    });\r",
+							"\r",
+							"    console.log(pm.response.json());\r",
+							"    console.log(\"Users ids are: \");\r",
+							"    console.log(usersIds);\r",
+							"});\r",
+							"\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://172.27.209.195:80/auth/users",
+					"protocol": "http",
+					"host": [
+						"172",
+						"27",
+						"209",
+						"195"
+					],
+					"port": "80",
+					"path": [
+						"auth",
+						"users"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Logout user",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Should return either 200 or 404 or 500\", () => {\r",
+							"    pm.expect(pm.response.body).to.not.exist\r",
+							"    pm.expect(pm.response.code).to.be.oneOf([200, 404, 500]);\r",
+							"    let usersArray = JSON.parse(pm.collectionVariables.get(\"USERS_ARRAY\"));\r",
+							"    let token = pm.collectionVariables.get(\"TOKEN\");\r",
+							"    const userIndex = usersArray.findIndex(user => user.token === token);\r",
+							"    pm.expect(userIndex).to.not.equal(-1, \"User with matching username not found in USERS_ARRAY\");\r",
+							"    usersArray[userIndex].token = null;\r",
+							"    pm.collectionVariables.set(\"USERS_ARRAY\", JSON.stringify(usersArray));\r",
+							"    pm.collectionVariables.set(\"TOKEN\", null);\r",
+							"\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "http://172.27.209.195:80/auth/logout/{{TOKEN}}",
+					"protocol": "http",
+					"host": [
+						"172",
+						"27",
+						"209",
+						"195"
+					],
+					"port": "80",
+					"path": [
+						"auth",
+						"logout",
+						"{{TOKEN}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get users",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"const schema = {\r",
+							"    type: 'array',\r",
+							"    uniqueItems: true,\r",
+							"    minItems: 0,\r",
+							"    items: {\r",
+							"        type: 'object',\r",
+							"        properties: {\r",
+							"            user_id: { type: 'number' },\r",
+							"            username: { type: 'string' },\r",
+							"            email: { type: 'string' },\r",
+							"            token: { oneOf: [{ type: 'string' }, { type: 'null' }] }\r",
+							"        },\r",
+							"        additionalProperties: false\r",
+							"    }\r",
+							"};\r",
+							"\r",
+							"const usersIds = JSON.parse(pm.collectionVariables.get(\"USERS_IDS\") || \"[]\");\r",
+							"\r",
+							"pm.test(\"Body should either be empty or respect the schema\", () => {\r",
+							"    pm.response.to.have.status(200);\r",
+							"    const responseJSON = pm.response.json();\r",
+							"    pm.expect(responseJSON).to.be.an(\"array\");\r",
+							"    pm.expect(responseJSON.length).to.eql(usersIds.length);\r",
+							"\r",
+							"    pm.response.to.have.jsonSchema(schema);\r",
+							"    responseJSON.forEach(e => {\r",
+							"        pm.expect(usersIds.indexOf(e.user_id)).to.not.eql(-1);\r",
+							"    });\r",
+							"\r",
+							"    console.log(pm.response.json());\r",
+							"    console.log(\"Users ids are: \");\r",
+							"    console.log(usersIds);\r",
+							"});\r",
+							"\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://172.27.209.195:80/auth/users",
+					"protocol": "http",
+					"host": [
+						"172",
+						"27",
+						"209",
+						"195"
+					],
+					"port": "80",
+					"path": [
+						"auth",
+						"users"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Login user1",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"const schema = {\r",
+							"  type: 'object',\r",
+							"  minItems: 1,\r",
+							"  maxItems: 1,\r",
+							"  properties: {\r",
+							"    token: { type: 'string' }\r",
+							"  },\r",
+							"  additionalProperties: false\r",
+							"};\r",
+							"\r",
+							"pm.test(\"Response should either be 200 and have token, or 401 or 400\", () => {\r",
+							"    pm.expect(pm.response.code).to.be.oneOf([200, 400, 401]);\r",
+							"    const status = pm.response.code;\r",
+							"\r",
+							"    if (status === 200) {\r",
+							"\r",
+							"      //  pm.expect(pm.response.headers.get('Content-Type').split(';')[0]).to.eql('application/json');\r",
+							"        pm.response.to.have.jsonSchema(schema);\r",
+							"        console.log(pm.response.json());\r",
+							"        let usersArray = JSON.parse(pm.collectionVariables.get(\"USERS_ARRAY\"));\r",
+							"        let token = pm.response.json().token;\r",
+							"        const bodyJson = JSON.parse(pm.request.body);\r",
+							"        const usernameFromRequest = bodyJson.username;\r",
+							"        const userIndex = usersArray.findIndex(user => user.username === usernameFromRequest);\r",
+							"        pm.expect(userIndex).to.not.equal(-1, \"User with matching username not found in USERS_ARRAY\");\r",
+							"        usersArray[userIndex].token = token;\r",
+							"        pm.collectionVariables.set(\"USERS_ARRAY\", JSON.stringify(usersArray));\r",
+							"        pm.collectionVariables.set(\"TOKEN\", token);\r",
+							"    }\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"username\": \"firstIDPuser\",\r\n    \"password\": \"IDPpassword\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://172.27.209.195:80/auth/login",
+					"protocol": "http",
+					"host": [
+						"172",
+						"27",
+						"209",
+						"195"
+					],
+					"port": "80",
+					"path": [
+						"auth",
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Add workspace",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"let initialized = pm.variables.get(\"ADD_WORKSPACE_INIT\");\r",
+							"console.log(initialized);\r",
+							"if (!initialized) {\r",
+							"    const workspaces = [\r",
+							"        {\r",
+							"            \"workspace_name\": \"PR606\",\r",
+							"            \"capacity\": 20,\r",
+							"            \"location\": \"Precis\",\r",
+							"            \"description\": \"Sala de laborator\"\r",
+							"        },\r",
+							"        {\r",
+							"            \"workspace_name\": \"EC001\",\r",
+							"            \"capacity\": 60,\r",
+							"            \"location\": \"Corp EC\",\r",
+							"            \"description\": \"Sala de curs\"\r",
+							"        }\r",
+							"    ];\r",
+							"    initialized = true;\r",
+							"    pm.variables.set(\"ADD_WORKSPACE_INIT\", initialized);\r",
+							"    pm.collectionVariables.set(\"WORKSPACES_IDS\", JSON.stringify([]));\r",
+							"    pm.variables.set(\"ADD_WORKSPACE_DATASET\", JSON.stringify(workspaces));\r",
+							"}\r",
+							"\r",
+							"const workspacedataset = JSON.parse(pm.variables.get(\"ADD_WORKSPACE_DATASET\"));\r",
+							"const currentWorkspace = workspacedataset.shift();\r",
+							"console.log(currentWorkspace);\r",
+							"console.log(workspacedataset);\r",
+							"pm.variables.set(\"CURRENT_WORKSPACE\", JSON.stringify(currentWorkspace));\r",
+							"pm.variables.set(\"ADD_WORKSPACE_DATASET\", JSON.stringify(workspacedataset));\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// No changes needed for the response time test",
+							"const schema = {",
+							"  type: 'object',",
+							"  minItems: 1,",
+							"  maxItems: 1,",
+							"  properties: {",
+							"    message: { type: 'string' },",
+							"    workspace_id: { type: 'number' }",
+							"  },",
+							"  additionalProperties: false",
+							"};",
+							"",
+							"pm.test(\"Response should either be 201 and have id, or 500\", () => {",
+							"    pm.expect(pm.response.code).to.be.oneOf([201, 500]);",
+							"    const status = pm.response.code;",
+							"",
+							"    if (status === 201) {",
+							"",
+							"      //  pm.expect(pm.response.headers.get('Content-Type').split(';')[0]).to.eql('application/json');",
+							"        pm.response.to.have.jsonSchema(schema);",
+							"        ",
+							"        const resultId = pm.response.json().workspace_id;",
+							"        const workspacesIds = JSON.parse(pm.collectionVariables.get(\"WORKSPACES_IDS\"));",
+							"        workspacesIds.push(resultId);",
+							"        pm.collectionVariables.set(\"WORKSPACES_IDS\", JSON.stringify(workspacesIds));",
+							"    }",
+							"",
+							"    const workspacedataset = JSON.parse(pm.variables.get(\"ADD_WORKSPACE_DATASET\"));",
+							"    console.log(workspacedataset);",
+							"    console.log(workspacedataset.length);",
+							"    if (workspacedataset.length > 0) {",
+							"        pm.execution.setNextRequest(\"Add workspace\");",
+							"    } ",
+							"});",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "{{TOKEN}}"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{{CURRENT_WORKSPACE}}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://172.27.209.195:80/api/workspace",
+					"protocol": "http",
+					"host": [
+						"172",
+						"27",
+						"209",
+						"195"
+					],
+					"port": "80",
+					"path": [
+						"api",
+						"workspace"
+					],
+					"query": [
+						{
+							"key": "",
+							"value": null,
+							"disabled": true
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get workspaces",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"const schema = {\r",
+							"    type: 'array',\r",
+							"    uniqueItems: true,\r",
+							"    minItems: 0,\r",
+							"    items: {\r",
+							"        type: 'object',\r",
+							"        properties: {\r",
+							"            workspace_id: { type: 'number' },\r",
+							"            workspace_name: { type: 'string' },\r",
+							"            capacity: { type: 'number' },\r",
+							"            location: { type: 'string' },\r",
+							"            description: { type: 'string' }\r",
+							"        },\r",
+							"        additionalProperties: false\r",
+							"    }\r",
+							"};\r",
+							"\r",
+							"const workspacesIds = JSON.parse(pm.collectionVariables.get(\"WORKSPACES_IDS\") || \"[]\");\r",
+							"\r",
+							"pm.test(\"Body should either be empty or respect the schema\", () => {\r",
+							"    pm.response.to.have.status(200);\r",
+							"    const responseJSON = pm.response.json();\r",
+							"    pm.expect(responseJSON).to.be.an(\"array\");\r",
+							"    pm.expect(responseJSON.length).to.eql(workspacesIds.length);\r",
+							"\r",
+							"    pm.response.to.have.jsonSchema(schema);\r",
+							"    responseJSON.forEach(e => {\r",
+							"        pm.expect(workspacesIds.indexOf(e.workspace_id)).to.not.eql(-1);\r",
+							"    });\r",
+							"\r",
+							"    console.log(pm.response.json());\r",
+							"    console.log(\"Workspaces ids are: \");\r",
+							"    console.log(workspacesIds);\r",
+							"});\r",
+							"\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "{{TOKEN}}"
+					}
+				],
+				"url": {
+					"raw": "http://172.27.209.195:80/api/workspaces",
+					"protocol": "http",
+					"host": [
+						"172",
+						"27",
+						"209",
+						"195"
+					],
+					"port": "80",
+					"path": [
+						"api",
+						"workspaces"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create reservation",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"let initialized = pm.variables.get(\"ADD_RESERVATION_INIT\");\r",
+							"console.log(initialized);\r",
+							"if (!initialized) {\r",
+							"    const reservations = [\r",
+							"        {\r",
+							"            \"user_id\": 1,\r",
+							"            \"workspace_id\": 1,\r",
+							"            \"start_time\": \"2024-05-11 08:00:00\",\r",
+							"            \"end_time\": \"2024-05-11 10:00:00\",\r",
+							"            \"reservation_date\": \"2024-05-11\"\r",
+							"        },\r",
+							"        {\r",
+							"            \"user_id\": 1,\r",
+							"            \"workspace_id\": 1,\r",
+							"            \"start_time\": \"2024-05-16 10:00:00\",\r",
+							"            \"end_time\": \"2024-05-16 12:00:00\",\r",
+							"            \"reservation_date\": \"2024-05-16\"\r",
+							"        }\r",
+							"    ];\r",
+							"    initialized = true;\r",
+							"    pm.variables.set(\"ADD_RESERVATION_INIT\", initialized);\r",
+							"    pm.variables.set(\"ADD_RESERVATION_DATASET\", JSON.stringify(reservations));\r",
+							"}\r",
+							"\r",
+							"const dataset = JSON.parse(pm.variables.get(\"ADD_RESERVATION_DATASET\"));\r",
+							"const currentReservation = dataset.shift();\r",
+							"console.log(currentReservation);\r",
+							"console.log(dataset);\r",
+							"pm.variables.set(\"CURRENT_RESERVATION\", JSON.stringify(currentReservation));\r",
+							"pm.variables.set(\"ADD_RESERVATION_DATASET\", JSON.stringify(dataset));\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// No changes needed for the response time test",
+							"const schema = {",
+							"  type: 'object',",
+							"  minItems: 1,",
+							"  maxItems: 1,",
+							"  properties: {",
+							"    message: { type: 'string' },",
+							"  },",
+							"  additionalProperties: false",
+							"};",
+							"",
+							"pm.test(\"Response should either be 201 or 400 or 500\", () => {",
+							"    pm.expect(pm.response.code).to.be.oneOf([201, 400, 500]);",
+							"    const status = pm.response.code;",
+							"",
+							"    if (status === 201) {",
+							"",
+							"      //  pm.expect(pm.response.headers.get('Content-Type').split(';')[0]).to.eql('application/json');",
+							"        pm.response.to.have.jsonSchema(schema);",
+							"        ",
+							"    }",
+							"",
+							"    const dataset = JSON.parse(pm.variables.get(\"ADD_RESERVATION_DATASET\"));",
+							"    console.log(dataset);",
+							"    console.log(dataset.length);",
+							"    if (dataset.length > 0) {",
+							"        pm.execution.setNextRequest(\"Create reservation\");",
+							"    } ",
+							"});",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "{{TOKEN}}"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{{CURRENT_RESERVATION}}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://172.27.209.195:80/api/reservation",
+					"protocol": "http",
+					"host": [
+						"172",
+						"27",
+						"209",
+						"195"
+					],
+					"port": "80",
+					"path": [
+						"api",
+						"reservation"
+					],
+					"query": [
+						{
+							"key": "",
+							"value": null,
+							"disabled": true
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "View user 1 reservations",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"const schema = {\r",
+							"    type: 'array',\r",
+							"    uniqueItems: true,\r",
+							"    minItems: 0,\r",
+							"    items: {\r",
+							"        type: 'object',\r",
+							"        properties: {\r",
+							"            reservation_id: { type: 'number' },\r",
+							"            workspace_id: { type: 'number' },\r",
+							"            start_time: {type: 'string'},\r",
+							"            end_time: {type: 'string'},\r",
+							"            reservation_date: {type: 'string'}\r",
+							"        },\r",
+							"        additionalProperties: false\r",
+							"    }\r",
+							"};\r",
+							"\r",
+							"pm.test(\"Body should either be empty or respect the schema\", () => {\r",
+							"    pm.response.to.have.status(200);\r",
+							"    const responseJSON = pm.response.json();\r",
+							"    pm.expect(responseJSON).to.be.an(\"array\");\r",
+							"\r",
+							"    pm.response.to.have.jsonSchema(schema);\r",
+							"\r",
+							"    console.log(pm.response.json());\r",
+							"    \r",
+							"});\r",
+							"\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "{{TOKEN}}"
+					}
+				],
+				"url": {
+					"raw": "http://172.27.209.195:80/api/reservations/1",
+					"protocol": "http",
+					"host": [
+						"172",
+						"27",
+						"209",
+						"195"
+					],
+					"port": "80",
+					"path": [
+						"api",
+						"reservations",
+						"1"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "USERS_IDS",
+			"value": ""
+		},
+		{
+			"key": "USERS_ARRAY",
+			"value": ""
+		},
+		{
+			"key": "TOKEN",
+			"value": ""
+		},
+		{
+			"key": "WORKSPACES_IDS",
+			"value": ""
+		}
+	]
+}

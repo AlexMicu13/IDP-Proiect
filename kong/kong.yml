@@ -19,6 +19,12 @@ services:
       - name: auth-register
         paths: 
           - /auth/register
+  - name: auth-service-users
+    url: http://auth-service:80/users
+    routes:
+      - name: auth-users
+        paths: 
+          - /auth/users
   - name: auth-service-logout
     url: http://auth-service:80/logout
     routes:

@@ -76,7 +76,7 @@ def login_user():
             cur.execute("UPDATE Users SET token = %s WHERE username = %s", (token, username))
             conn.commit()
             
-            return jsonify({'token': token})
+            return jsonify({'token': token}), 200
         else:
             return jsonify({'error': 'Invalid username or password'}), 401
     except psycopg2.Error as e:
@@ -102,7 +102,7 @@ def logout_user(token):
         # Delete the token from the database
         cur.execute("UPDATE Users SET token = NULL WHERE token = %s", (token,))
         conn.commit()
-        return jsonify({'message': 'User logged out successfully'})
+        return jsonify({'message': 'User logged out successfully'}), 200
     except psycopg2.Error as e:
         conn.rollback()
         return jsonify({'error': str(e)}), 500
@@ -110,9 +110,37 @@ def logout_user(token):
         cur.close()
         conn.close()
 
+# Route for listing all users
+@app.route('/users', methods=['GET'])
+def list_users():
+    try:
+        conn = connect_to_db()
+        cur = conn.cursor()
+
+        # Query to retrieve all workspaces
+        cur.execute("SELECT * FROM Users")
+        users = cur.fetchall()
+
+        # Format the response
+        users_list = []
+        for user in users:
+            users_list.append({
+                'user_id': user[0],
+                'username': user[1],
+                'email': user[2],
+                'token': user[4]
+            })
+
+        return jsonify(users_list), 200
+    except psycopg2.Error as e:
+        return jsonify({'message': 'Error retrieving users', 'error': str(e)}), 500
+    finally:
+        cur.close()
+        conn.close()
+
 @app.route('/')
 def hello_world():
-    conn = psycopg2.connect(dbname="your_database_name", user="your_username", password="your_password", host="postgres")
+    conn = connect_to_db()
     cur = conn.cursor()
     cur.execute("SELECT * FROM Users")
     result = cur.fetchall()
