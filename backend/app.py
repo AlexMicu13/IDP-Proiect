@@ -9,9 +9,9 @@ app = Flask(__name__)
 # Function to establish database connection
 def connect_to_db():
     conn = psycopg2.connect(
-        dbname="your_database_name", 
-        user="your_username", 
-        password="your_password", 
+        dbname="database", 
+        user="postgres", 
+        password="postgres", 
         host="postgres"
     )
     return conn
@@ -266,7 +266,7 @@ def delete_reservation(reservation_id):
 @app.route('/')
 @token_required
 def hello_world():
-    conn = psycopg2.connect(dbname="your_database_name", user="your_username", password="your_password", host="postgres")
+    conn = psycopg2.connect(dbname="database", user="postgres", password="postgres", host="postgres")
     cur = conn.cursor()
     cur.execute("SELECT * FROM Users")
     result = cur.fetchall()
