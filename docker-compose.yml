@@ -137,9 +137,9 @@ services:
           memory: 50M
       placement:
           constraints: [node.role == manager]
-      networks:
-        - internal
-        - logging
+    networks:
+      - internal
+      - logging
 
   grafana:
     image: grafana/grafana:latest
