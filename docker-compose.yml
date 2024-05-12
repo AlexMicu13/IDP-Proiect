@@ -41,10 +41,7 @@ services:
         condition: on-failure
 
   io_service:
-    image: io-service
-    build:
-      context: ./io/
-      dockerfile: Dockerfile
+    image: stefanjumarea/idp-io
     restart: always
     ports:
       - "5002:80" # Change 5000 to any desired port number
@@ -85,15 +82,10 @@ services:
         condition: on-failure
 
   flask-service:
-    image: flask-service
-    build:
-      context: ./backend/
-      dockerfile: Dockerfile
+    image: stefanjumarea/idp-backend
     restart: always
     depends_on:
       - io_service
-    ports:
-      - "5000:80" # Change 5000 to any desired port number
     networks:
       - internal
       - db-backend
@@ -107,18 +99,13 @@ services:
         condition: on-failure
 
   auth-service:
-    image: auth-service
-    build:
-      context: ./auth/
-      dockerfile: Dockerfile
+    image: stefanjumarea/idp-auth
     restart: always
     depends_on:
       - io_service
     networks:
       - internal
       - db-auth
-    ports:
-      - "5001:80" # Change 5000 to any desired port number
     deploy:
       replicas: 2
       resources:
