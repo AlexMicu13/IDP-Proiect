@@ -4,8 +4,6 @@ services:
   portainer:
     image: portainer/portainer-ce:latest
     restart: unless-stopped
-    ports:
-      - "9443:9443"
     volumes:
       - data:/data
       - /var/run/docker.sock:/var/run/docker.sock
@@ -13,10 +11,6 @@ services:
       - internal
     deploy:
       replicas: 1
-      resources:
-        limits:
-          cpus: "0.2"
-          memory: 50M
       restart_policy:
         condition: on-failure
       placement:
@@ -44,8 +38,6 @@ services:
   io_service:
     image: stefanjumarea/idp-io
     restart: always
-    ports:
-      - "5002:80" # Change 5000 to any desired port number
     networks:
       - internal
       - db
@@ -55,10 +47,6 @@ services:
       - postgres
     deploy:
       replicas: 1
-      resources:
-        limits:
-          cpus: "0.2"
-          memory: 50M
       restart_policy:
         condition: on-failure
 
@@ -68,17 +56,11 @@ services:
     environment:
       PGADMIN_DEFAULT_EMAIL: your_email@example.com
       PGADMIN_DEFAULT_PASSWORD: your_password
-    ports:
-      - "5050:80" # Change 5050 to any desired port number
     networks:
       - internal
       - db
     deploy:
       replicas: 1
-      resources:
-        limits:
-          cpus: "0.2"
-          memory: 50M
       restart_policy:
         condition: on-failure
 
@@ -92,10 +74,6 @@ services:
       - db-backend
     deploy:
       replicas: 4
-      resources:
-        limits:
-          cpus: "0.2"
-          memory: 50M
       restart_policy:
         condition: on-failure
 
@@ -109,10 +87,6 @@ services:
       - db-auth
     deploy:
       replicas: 2
-      resources:
-        limits:
-          cpus: "0.2"
-          memory: 50M
       restart_policy:
         condition: on-failure
 
@@ -138,8 +112,6 @@ services:
 
   grafana:
     image: stefanjumarea/idp-grafana
-    ports:
-      - 3000:3000
     user: "$UID:$GID"
     environment:
       - GF_SECURITY_ADMIN_USER=admin
@@ -149,10 +121,6 @@ services:
       - db
     deploy:
       replicas: 1
-      resources:
-        limits:
-          cpus: "0.2"
-          memory: 50M
 
   prometheus:
     image: stefanjumarea/idp-prometheus
@@ -162,10 +130,6 @@ services:
       - logging
     deploy:
       replicas: 1
-      resources:
-        limits:
-          cpus: "0.2"
-          memory: 50M
 
 
 volumes:

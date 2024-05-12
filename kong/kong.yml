@@ -61,6 +61,42 @@ services:
       - name: api-slots
         paths: 
           - /api/available-slots
+  - name: grafana
+    url: http://grafana:3000/
+    routes:
+      - name: grafana
+        paths: 
+          - /grafana
+  - name: portainer
+    url: http://portainer:9443/
+    routes:
+      - name: portainer
+        paths: 
+          - /portainer
+  - name: pgadmin
+    url: http://pgadmin:80/
+    routes:
+      - name: pgadmin
+        paths: 
+          - /pgadmin
+  - name: io
+    url: http://io_service:80/users
+    routes:
+      - name: io-users
+        paths: 
+          - /io/users
+  - name: io-res
+    url: http://io_service:80/reservations
+    routes:
+      - name: io-reservations
+        paths: 
+          - /io/reservations
+  - name: io-works
+    url: http://io_service:80/workspaces
+    routes:
+      - name: io-workspaces
+        paths: 
+          - /io/workspaces
 
 
 plugins:
