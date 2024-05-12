@@ -24,14 +24,12 @@ services:
           - "node.role==manager"
 
   postgres:
-    image: stefanjumarea/db:latest
+    image: stefanjumarea/idp-db:latest
     restart: always
     environment:
       POSTGRES_USER: "postgres"
       POSTGRES_PASSWORD: "postgres"
       POSTGRES_DB: "database"
-    volumes:
-      - db-vol:/docker-entrypoint-initdb.d/init.sql
     networks:
       - internal
       - db
@@ -120,8 +118,6 @@ services:
 
   kong:
     image: stefanjumarea/idp-kong:latest
-    volumes:
-      - kong-vol:/usr/local/kong/declarative
     environment:
       KONG_DATABASE: 'off'
       KONG_DECLARATIVE_CONFIG: /usr/local/kong/declarative/kong.yml
@@ -167,8 +163,6 @@ services:
 
   prometheus:
     image: prom/prometheus
-    volumes:
-      - prometheus-vol:/etc/prometheus/prometheus.yml
     ports:
       - 9090:9090
     networks:
@@ -183,24 +177,6 @@ services:
 
 volumes:
   data:
-  kong-vol:
-    driver: local
-    driver_opts:
-      type: none
-      device: ./kong/
-      o: bind
-  db-vol:
-    driver: local
-    driver_opts:
-      type: none
-      device: ./db/init.sql
-      o: bind
-  prometheus-vol:
-    driver: local
-    driver_opts:
-      type: none
-      device: ./prometheus/config.yml
-      o: bind
   grafana-vol:
     driver: local
     driver_opts:

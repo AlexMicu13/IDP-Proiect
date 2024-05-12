@@ -1,3 +1,4 @@
 FROM kong:latest
 
-COPY ./kong.yml /usr/local/kong/declarative
+RUN mkdir -p /usr/local/kong/declarative
+COPY ./kong.yml /usr/local/kong/declarative/kong.yml
