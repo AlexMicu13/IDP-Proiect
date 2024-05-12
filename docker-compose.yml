@@ -19,16 +19,17 @@ services:
           memory: 50M
       restart_policy:
         condition: on-failure
+      placement:
+        constraints:
+          - "node.role==manager"
 
   postgres:
-    image: postgres
+    image: stefanjumarea/idp-db:latest
     restart: always
     environment:
       POSTGRES_USER: "postgres"
       POSTGRES_PASSWORD: "postgres"
       POSTGRES_DB: "database"
-    volumes:
-      - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql
     networks:
       - internal
       - db
@@ -116,9 +117,7 @@ services:
         condition: on-failure
 
   kong:
-    image: kong:latest
-    volumes:
-      - ./kong:/usr/local/kong/declarative
+    image: stefanjumarea/idp-kong:latest
     environment:
       KONG_DATABASE: 'off'
       KONG_DECLARATIVE_CONFIG: /usr/local/kong/declarative/kong.yml
@@ -131,10 +130,6 @@ services:
       - 80:8000
     deploy:
       replicas: 1
-      resources:
-        limits:
-          cpus: "0.2"
-          memory: 50M
       placement:
           constraints: [node.role == manager]
     networks:
@@ -142,10 +137,7 @@ services:
       - logging
 
   grafana:
-    image: grafana/grafana:latest
-    volumes:
-      - ./grafana/data:/var/lib/grafana
-      - ./grafana-provisioning/:/etc/grafana/provisioning
+    image: stefanjumarea/idp-grafana
     ports:
       - 3000:3000
     user: "$UID:$GID"
@@ -163,9 +155,7 @@ services:
           memory: 50M
 
   prometheus:
-    image: prom/prometheus
-    volumes:
-      - ./prometheus/config.yml:/etc/prometheus/prometheus.yml
+    image: stefanjumarea/idp-prometheus
     ports:
       - 9090:9090
     networks:
