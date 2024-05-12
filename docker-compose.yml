@@ -130,10 +130,6 @@ services:
       - 80:8000
     deploy:
       replicas: 1
-      resources:
-        limits:
-          cpus: "0.2"
-          memory: 50M
       placement:
           constraints: [node.role == manager]
     networks:
@@ -141,10 +137,7 @@ services:
       - logging
 
   grafana:
-    image: grafana/grafana:latest
-    volumes:
-      - grafana-vol:/var/lib/grafana
-      - grafana-prov-vol:/etc/grafana/provisioning
+    image: stefanjumarea/idp-grafana
     ports:
       - 3000:3000
     user: "$UID:$GID"
@@ -162,7 +155,7 @@ services:
           memory: 50M
 
   prometheus:
-    image: prom/prometheus
+    image: stefanjumarea/idp-prometheus
     ports:
       - 9090:9090
     networks:
@@ -177,18 +170,6 @@ services:
 
 volumes:
   data:
-  grafana-vol:
-    driver: local
-    driver_opts:
-      type: none
-      device: ./grafana/data/
-      o: bind
-  grafana-prov-vol:
-    driver: local
-    driver_opts:
-      type: none
-      device: ./grafana-provisioning
-      o: bind
 
 networks:
   internal:
