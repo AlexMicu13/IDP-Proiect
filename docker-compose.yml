@@ -24,7 +24,7 @@ services:
           - "node.role==manager"
 
   postgres:
-    image: postgres
+    image: stefanjumarea/db:latest
     restart: always
     environment:
       POSTGRES_USER: "postgres"
@@ -119,7 +119,7 @@ services:
         condition: on-failure
 
   kong:
-    image: kong:latest
+    image: stefanjumarea/idp-kong:latest
     volumes:
       - kong-vol:/usr/local/kong/declarative
     environment:
