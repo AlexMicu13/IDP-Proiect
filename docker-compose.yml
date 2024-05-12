@@ -116,25 +116,27 @@ services:
         condition: on-failure
 
   kong:
-      image: kong:latest
-      volumes:
-        - ./kong:/usr/local/kong/declarative
-      environment:
-        KONG_DATABASE: 'off'
-        KONG_DECLARATIVE_CONFIG: /usr/local/kong/declarative/kong.yml
-        KONG_PROXY_ACCESS_LOG: /dev/stdout
-        KONG_ADMIN_ACCESS_LOG: /dev/stdout
-        KONG_PROXY_ERROR_LOG: /dev/stderr
-        KONG_ADMIN_ERROR_LOG: /dev/stderr
-        KONG_ADMIN_LISTEN: 0.0.0.0:8001, 0.0.0.0:8444 ssl
-      ports:
-        - 80:8000
-        - 443:8443
-        - 8001:8001
-        - 8444:8444
-      deploy:
-        placement:
-            constraints: [node.role == manager]
+    image: kong:latest
+    volumes:
+      - ./kong:/usr/local/kong/declarative
+    environment:
+      KONG_DATABASE: 'off'
+      KONG_DECLARATIVE_CONFIG: /usr/local/kong/declarative/kong.yml
+      KONG_PROXY_ACCESS_LOG: /dev/stdout
+      KONG_ADMIN_ACCESS_LOG: /dev/stdout
+      KONG_PROXY_ERROR_LOG: /dev/stderr
+      KONG_ADMIN_ERROR_LOG: /dev/stderr
+      KONG_ADMIN_LISTEN: 0.0.0.0:8001, 0.0.0.0:8444 ssl
+    ports:
+      - 80:8000
+    deploy:
+      replicas: 1
+      resources:
+        limits:
+          cpus: "0.2"
+          memory: 50M
+      placement:
+          constraints: [node.role == manager]
       networks:
         - internal
         - logging
@@ -153,6 +155,12 @@ services:
     networks:
       - logging
       - db
+    deploy:
+      replicas: 1
+      resources:
+        limits:
+          cpus: "0.2"
+          memory: 50M
 
   prometheus:
     image: prom/prometheus
@@ -162,6 +170,12 @@ services:
       - 9090:9090
     networks:
       - logging
+    deploy:
+      replicas: 1
+      resources:
+        limits:
+          cpus: "0.2"
+          memory: 50M
 
 
 volumes:
