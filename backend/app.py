@@ -180,27 +180,54 @@ def check_available_slots(workspace_id):
         conn = connect_to_db()
         cur = conn.cursor()
 
-        # Query to find available time slots for the given workspace
+        # Define working hours (convert these strings into datetime.time objects)
+        WORKING_HOURS_START = datetime.strptime("08:00:00", "%H:%M:%S").time()
+        WORKING_HOURS_END = datetime.strptime("22:00:00", "%H:%M:%S").time()
+
+        # Query to fetch only the time portion (casting start_time and end_time to TIME)
         cur.execute("""
-            SELECT * FROM Reservations 
+            SELECT start_time::time, end_time::time 
+            FROM Reservations 
             WHERE workspace_id = %s 
             AND reservation_date = CURRENT_DATE 
             ORDER BY start_time
         """, (workspace_id,))
+
         reservations = cur.fetchall()
 
         available_slots = []
 
-        # Find gaps between reservations
+        # Case 1: No reservations → Entire working hours are available
+        if not reservations:
+            available_slots.append({"start_time": str(WORKING_HOURS_START), "end_time": str(WORKING_HOURS_END)})
+            return jsonify(available_slots), 200
+
+        # Case 2: Handle when there are reservations
+        # Extract first and last reservations
+        first_reservation_start = reservations[0][0]
+        last_reservation_end = reservations[-1][1]
+
+        # Case 3: Check for available time before the first reservation
+        if WORKING_HOURS_START < first_reservation_start:
+            available_slots.append({"start_time": str(WORKING_HOURS_START), "end_time": str(first_reservation_start)})
+
+        # Case 4: Check for available gaps between reservations
         for i in range(len(reservations) - 1):
-            end_time = reservations[i][4]  # end_time of current reservation
-            next_start_time = reservations[i + 1][3]  # start_time of next reservation
-            if end_time < next_start_time:
-                available_slots.append({'start_time': end_time, 'end_time': next_start_time})
+            current_end_time = reservations[i][1]  # End time of current reservation
+            next_start_time = reservations[i + 1][0]  # Start time of next reservation
+
+            if current_end_time < next_start_time:
+                available_slots.append({"start_time": str(current_end_time), "end_time": str(next_start_time)})
+
+        # Case 5: Check for available time after the last reservation
+        if last_reservation_end < WORKING_HOURS_END:
+            available_slots.append({"start_time": str(last_reservation_end), "end_time": str(WORKING_HOURS_END)})
 
         return jsonify(available_slots), 200
+
     except psycopg2.Error as e:
         return jsonify({'message': 'Error retrieving available slots.', 'error': str(e)}), 500
+
     finally:
         cur.close()
         conn.close()

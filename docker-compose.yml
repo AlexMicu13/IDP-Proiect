@@ -20,7 +20,7 @@ services:
           - "node.role==manager"
 
   postgres:
-    image: stefanjumarea/idp-db:latest
+    image: elenaulariu/db_service:latest
     restart: always
     environment:
       POSTGRES_USER: "postgres"
@@ -38,7 +38,7 @@ services:
         condition: on-failure
 
   io_service:
-    image: stefanjumarea/idp-io
+    image: elenaulariu/io_service:latest
     restart: always
     networks:
       - internal
@@ -69,7 +69,7 @@ services:
         condition: on-failure
 
   flask-service:
-    image: stefanjumarea/idp-backend
+    image: elenaulariu/flask_service:latest
     restart: always
     depends_on:
       - io_service
@@ -82,7 +82,7 @@ services:
         condition: on-failure
 
   auth-service:
-    image: stefanjumarea/idp-auth
+    image: elenaulariu/auth_service:latest
     restart: always
     depends_on:
       - io_service
@@ -95,7 +95,7 @@ services:
         condition: on-failure
 
   kong:
-    image: stefanjumarea/idp-kong:latest
+    image: elenaulariu/kong_service:latest
     environment:
       KONG_DATABASE: 'off'
       KONG_DECLARATIVE_CONFIG: /usr/local/kong/declarative/kong.yml
@@ -115,7 +115,7 @@ services:
       - logging
 
   grafana:
-    image: stefanjumarea/idp-grafana
+    image: elenaulariu/grafana_service:latest
     ports:
       - 3000:3000
     user: "$UID:$GID"
@@ -129,7 +129,7 @@ services:
       replicas: 1
 
   prometheus:
-    image: stefanjumarea/idp-prometheus
+    image: elenaulariu/prometheus_service:latest
     ports:
       - 9090:9090
     networks:
