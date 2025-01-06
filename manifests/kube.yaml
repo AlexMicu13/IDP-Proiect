@@ -72,39 +72,41 @@ spec:
         ports:
         - containerPort: 83
 
-      - name: kong
-        image: amalia3007/kong:v1
-        ports:
-        - containerPort: 8000  # Internal Kong proxy port
-        - containerPort: 8001  # Internal Kong admin port
-        - containerPort: 8444  # Internal Kong secure admin port
-        env:
-        - name: KONG_DATABASE
-          value: "off"
-        - name: KONG_DECLARATIVE_CONFIG
-          value: "/usr/local/kong/declarative/kong.yml"
-        - name: KONG_PROXY_ACCESS_LOG
-          value: "/dev/stdout"
-        - name: KONG_ADMIN_ACCESS_LOG
-          value: "/dev/stdout"
-        - name: KONG_PROXY_ERROR_LOG
-          value: "/dev/stderr"
-        - name: KONG_ADMIN_ERROR_LOG
-          value: "/dev/stderr"
-        - name: KONG_ADMIN_LISTEN
-          value: "0.0.0.0:8001, 0.0.0.0:8444 ssl"
-
       - name: prometheus
         image: amalia3007/prometheus:v1
         ports:
         - containerPort: 9090
+
+      - name: portainer
+        image: portainer/portainer-ce:latest
+        ports:
+        - containerPort: 9443  # HTTPS Port
+        - containerPort: 9000  # HTTP
+        volumeMounts:
+        - name: portainer-data
+          mountPath: /data
+
+      - name: pgadmin
+        image: dpage/pgadmin4
+        ports:
+        - containerPort: 80  # Internal port for pgAdmin
+        env:
+        - name: PGADMIN_DEFAULT_EMAIL
+          value: your_email@example.com
+        - name: PGADMIN_DEFAULT_PASSWORD
+          value: your_password
 
       volumes:
       - name: grafana-data
         emptyDir: {}  # For ephemeral storage
       - name: postgres-data
         emptyDir: {}  # Use PersistentVolumeClaim for production environments
-
+      - name: docker-sock
+        hostPath:
+          path: /var/run/docker.sock
+          type: Socket
+      - name: portainer-data
+        emptyDir: {}  # Use PersistentVolumeClaim for production
 ---
 apiVersion: v1
 kind: Service
@@ -134,21 +136,24 @@ spec:
     port: 83
     targetPort: 83
     nodePort: 31500
-  # KONG
-  - name: proxy
-    protocol: TCP
-    port: 80       # External port
-    targetPort: 8000  # Kong proxy port inside the container
-  - name: admin
-    protocol: TCP
-    port: 8001     # External admin API port
-    targetPort: 8001
-  - name: admin-secure
-    protocol: TCP
-    port: 8444     # External secure admin API port
-    targetPort: 8444
-
+  # PROMETHEUS
   - name: prometheus
     protocol: TCP
     port: 9090       # External port
     targetPort: 9090 # Prometheus container port
+  # PORTAINER
+  - name: portainer
+    port: 9000
+    targetPort: 9000
+    nodePort: 31005  # Accessible on Minikube
+  # PGADMIN
+  - name: pgadmin
+    protocol: TCP
+    port: 5050       # External port
+    targetPort: 80   # Port inside the container
+    nodePort: 31050  # Fixed NodePort for consistency
+  - name: grafana
+    protocol: TCP
+    port: 80           # External port to expose Grafana
+    targetPort: 3000
+    nodePort: 30555
