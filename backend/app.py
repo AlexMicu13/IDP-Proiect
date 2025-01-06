@@ -9,10 +9,11 @@ app = Flask(__name__)
 # Function to establish database connection
 def connect_to_db():
     conn = psycopg2.connect(
-        dbname="database", 
-        user="postgres", 
-        password="postgres", 
-        host="postgres"
+        dbname="database",
+        user="postgres",
+        password="postgres",
+        host="localhost",
+        port=5432
     )
     return conn
 
@@ -150,8 +151,8 @@ def make_reservation():
 
         # Check if the workspace is available for the given time slot
         cur.execute("""
-            SELECT * FROM Reservations 
-            WHERE workspace_id = %s 
+            SELECT * FROM Reservations
+            WHERE workspace_id = %s
             AND (%s, %s) OVERLAPS (start_time, end_time)
         """, (workspace_id, start_time, end_time))
         existing_reservation = cur.fetchone()
@@ -186,10 +187,10 @@ def check_available_slots(workspace_id):
 
         # Query to fetch only the time portion (casting start_time and end_time to TIME)
         cur.execute("""
-            SELECT start_time::time, end_time::time 
-            FROM Reservations 
-            WHERE workspace_id = %s 
-            AND reservation_date = CURRENT_DATE 
+            SELECT start_time::time, end_time::time
+            FROM Reservations
+            WHERE workspace_id = %s
+            AND reservation_date = CURRENT_DATE
             ORDER BY start_time
         """, (workspace_id,))
 
@@ -242,7 +243,7 @@ def list_reservations(user_id):
 
         # Query to retrieve all reservations for a user
         cur.execute("""
-            SELECT * FROM Reservations 
+            SELECT * FROM Reservations
             WHERE user_id = %s
         """, (user_id,))
         reservations = cur.fetchall()
@@ -301,5 +302,10 @@ def hello_world():
     conn.close()
     return str(result)
 
+@app.route('/backend-test')
+def test():
+    return jsonify({'backend': 'successfully'}), 201
+
+
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=80)
+    app.run(host='0.0.0.0', port=82)

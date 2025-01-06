@@ -9,7 +9,8 @@ def connect_to_db():
         dbname="database",
         user="postgres",
         password="postgres",
-        host="postgres"
+        host="localhost",
+        port=5432
     )
     return conn
 
@@ -19,11 +20,11 @@ def get_all_users():
     try:
         conn = connect_to_db()
         cur = conn.cursor()
-        
+
         # Fetch all users
         cur.execute("SELECT * FROM Users")
         users = cur.fetchall()
-        
+
         # Format the data for JSON response
         users_list = []
         for user in users:
@@ -33,7 +34,7 @@ def get_all_users():
                 'email': user[2],
                 'created_at': user[5],
             })
-        
+
         return jsonify(users_list), 200
     except psycopg2.Error as e:
         return jsonify({'error': str(e)}), 500
@@ -47,11 +48,11 @@ def get_all_workspaces():
     try:
         conn = connect_to_db()
         cur = conn.cursor()
-        
+
         # Fetch all workspaces
         cur.execute("SELECT * FROM Workspaces")
         workspaces = cur.fetchall()
-        
+
         # Format the data for JSON response
         workspaces_list = []
         for workspace in workspaces:
@@ -63,7 +64,7 @@ def get_all_workspaces():
                 'description': workspace[4],
                 'created_at': workspace[5],
             })
-        
+
         return jsonify(workspaces_list), 200
     except psycopg2.Error as e:
         return jsonify({'error': str(e)}), 500
@@ -77,11 +78,11 @@ def get_all_reservations():
     try:
         conn = connect_to_db()
         cur = conn.cursor()
-        
+
         # Fetch all reservations
         cur.execute("SELECT * FROM Reservations")
         reservations = cur.fetchall()
-        
+
         # Format the data for JSON response
         reservations_list = []
         for reservation in reservations:
@@ -93,7 +94,7 @@ def get_all_reservations():
                 'end_time': reservation[4],
                 'reservation_date': reservation[5],
             })
-        
+
         return jsonify(reservations_list), 200
     except psycopg2.Error as e:
         return jsonify({'error': str(e)}), 500
@@ -102,4 +103,4 @@ def get_all_reservations():
         conn.close()
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=80)
+    app.run(host='0.0.0.0', port=83)

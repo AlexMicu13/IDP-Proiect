@@ -1,0 +1,154 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: python-api
+  namespace: default
+  labels:
+    app:  python-api
+spec:
+  selector:
+    matchLabels:
+      app: python-api
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app:  python-api
+    spec:
+      containers:
+      - name:  python-api
+        image: amalia3007/auth:v5
+        resources:
+          requests:
+            cpu: 50m
+            memory: 50Mi
+          limits:
+            cpu: 50m
+            memory: 50Mi
+        ports:
+        - containerPort:  81
+      - name:  backend-api
+        image: amalia3007/backend:v6
+        resources:
+          requests:
+            cpu: 50m
+            memory: 50Mi
+          limits:
+            cpu: 50m
+            memory: 50Mi
+        ports:
+        - containerPort:  82
+
+      - name: postgres
+        image: amalia3007/db:v1  # Replace with your desired PostgreSQL version
+        ports:
+        - containerPort: 5432
+        env:
+        - name: POSTGRES_USER
+          value: "postgres"
+        - name: POSTGRES_PASSWORD
+          value: "postgres"
+        - name: POSTGRES_DB
+          value: "database"
+        volumeMounts:
+        - mountPath: /var/lib/postgresql/data
+          name: postgres-data
+
+      - name: grafana
+        image: amalia3007/grafana:v1
+        ports:
+        - containerPort: 3000
+        env:
+        - name: GF_SECURITY_ADMIN_USER
+          value: admin
+        - name: GF_SECURITY_ADMIN_PASSWORD
+          value: admin
+        volumeMounts:
+        - name: grafana-data
+          mountPath: /var/lib/grafana
+
+      - name: io
+        image: amalia3007/io:v4
+        ports:
+        - containerPort: 83
+
+      - name: kong
+        image: amalia3007/kong:v1
+        ports:
+        - containerPort: 8000  # Internal Kong proxy port
+        - containerPort: 8001  # Internal Kong admin port
+        - containerPort: 8444  # Internal Kong secure admin port
+        env:
+        - name: KONG_DATABASE
+          value: "off"
+        - name: KONG_DECLARATIVE_CONFIG
+          value: "/usr/local/kong/declarative/kong.yml"
+        - name: KONG_PROXY_ACCESS_LOG
+          value: "/dev/stdout"
+        - name: KONG_ADMIN_ACCESS_LOG
+          value: "/dev/stdout"
+        - name: KONG_PROXY_ERROR_LOG
+          value: "/dev/stderr"
+        - name: KONG_ADMIN_ERROR_LOG
+          value: "/dev/stderr"
+        - name: KONG_ADMIN_LISTEN
+          value: "0.0.0.0:8001, 0.0.0.0:8444 ssl"
+
+      - name: prometheus
+        image: amalia3007/prometheus:v1
+        ports:
+        - containerPort: 9090
+
+      volumes:
+      - name: grafana-data
+        emptyDir: {}  # For ephemeral storage
+      - name: postgres-data
+        emptyDir: {}  # Use PersistentVolumeClaim for production environments
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: python-api-service
+  namespace: default
+spec:
+  selector:
+    app: python-api
+  type: LoadBalancer
+  ports:
+  # AUTH SERVICE
+  - name: auth
+    protocol: TCP
+    port: 81
+    targetPort: 81
+    nodePort: 31000
+  # BACKEND API
+  - name: backend
+    protocol: TCP
+    port: 82
+    targetPort: 82
+    nodePort: 32000
+  # IO SERVICE
+  - name: io
+    protocol: TCP
+    port: 83
+    targetPort: 83
+    nodePort: 31500
+  # KONG
+  - name: proxy
+    protocol: TCP
+    port: 80       # External port
+    targetPort: 8000  # Kong proxy port inside the container
+  - name: admin
+    protocol: TCP
+    port: 8001     # External admin API port
+    targetPort: 8001
+  - name: admin-secure
+    protocol: TCP
+    port: 8444     # External secure admin API port
+    targetPort: 8444
+
+  - name: prometheus
+    protocol: TCP
+    port: 9090       # External port
+    targetPort: 9090 # Prometheus container port

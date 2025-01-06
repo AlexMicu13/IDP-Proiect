@@ -15,7 +15,7 @@ RUN apt-get update \
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Make port 80 available to the world outside this container
-EXPOSE 80
+EXPOSE 81
 
 # Define environment variable
 ENV NAME World
