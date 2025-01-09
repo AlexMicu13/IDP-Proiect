@@ -1,7 +1,7 @@
 {
 	"info": {
-		"_postman_id": "68c09e72-7cb8-4b2d-977c-a2c66e583482",
-		"name": "IDP proiect",
+		"_postman_id": "d95d1af8-a0da-49f3-a473-78fc9a9fd307",
+		"name": "IDP proiect local",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
 		"_exporter_id": "20907152"
 	},
@@ -117,13 +117,10 @@
 					}
 				},
 				"url": {
-					"raw": "http://20.242.168.228:81/register",
+					"raw": "http://localhost:81/register",
 					"protocol": "http",
 					"host": [
-						"20",
-						"242",
-						"168",
-						"228"
+						"localhost"
 					],
 					"port": "81",
 					"path": [
@@ -185,13 +182,10 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "http://20.242.168.228:81/users",
+					"raw": "http://localhost:81/users",
 					"protocol": "http",
 					"host": [
-						"20",
-						"242",
-						"168",
-						"228"
+						"localhost"
 					],
 					"port": "81",
 					"path": [
@@ -257,13 +251,10 @@
 					}
 				},
 				"url": {
-					"raw": "http://20.242.168.228:81/login",
+					"raw": "http://localhost:81/login",
 					"protocol": "http",
 					"host": [
-						"20",
-						"242",
-						"168",
-						"228"
+						"localhost"
 					],
 					"port": "81",
 					"path": [
@@ -325,13 +316,10 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "http://20.242.168.228:81/users",
+					"raw": "http://localhost:81/users",
 					"protocol": "http",
 					"host": [
-						"20",
-						"242",
-						"168",
-						"228"
+						"localhost"
 					],
 					"port": "81",
 					"path": [
@@ -380,13 +368,10 @@
 				"method": "DELETE",
 				"header": [],
 				"url": {
-					"raw": "http://20.242.168.228:81/logout/{{TOKEN}}",
+					"raw": "http://localhost:81/logout/{{TOKEN}}",
 					"protocol": "http",
 					"host": [
-						"20",
-						"242",
-						"168",
-						"228"
+						"localhost"
 					],
 					"port": "81",
 					"path": [
@@ -449,13 +434,10 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "http://20.242.168.228:81/users",
+					"raw": "http://localhost:81/users",
 					"protocol": "http",
 					"host": [
-						"20",
-						"242",
-						"168",
-						"228"
+						"localhost"
 					],
 					"port": "81",
 					"path": [
@@ -521,13 +503,10 @@
 					}
 				},
 				"url": {
-					"raw": "http://20.242.168.228:81/login",
+					"raw": "http://localhost:81/login",
 					"protocol": "http",
 					"host": [
-						"20",
-						"242",
-						"168",
-						"228"
+						"localhost"
 					],
 					"port": "81",
 					"path": [
@@ -642,13 +621,10 @@
 					}
 				},
 				"url": {
-					"raw": "http://20.242.168.228:82/workspace",
+					"raw": "http://localhost:82/workspace",
 					"protocol": "http",
 					"host": [
-						"20",
-						"242",
-						"168",
-						"228"
+						"localhost"
 					],
 					"port": "82",
 					"path": [
@@ -723,13 +699,10 @@
 					}
 				],
 				"url": {
-					"raw": "http://20.242.168.228:82/workspaces",
+					"raw": "http://localhost:82/workspaces",
 					"protocol": "http",
 					"host": [
-						"20",
-						"242",
-						"168",
-						"228"
+						"localhost"
 					],
 					"port": "82",
 					"path": [
@@ -869,13 +842,10 @@
 					}
 				},
 				"url": {
-					"raw": "http://20.242.168.228:82/reservation",
+					"raw": "http://localhost:82/reservation",
 					"protocol": "http",
 					"host": [
-						"20",
-						"242",
-						"168",
-						"228"
+						"localhost"
 					],
 					"port": "82",
 					"path": [
@@ -954,13 +924,10 @@
 					}
 				],
 				"url": {
-					"raw": "http://20.242.168.228:82/reservations/{{FIRST_USER}}",
+					"raw": "http://localhost:82/reservations/{{FIRST_USER}}",
 					"protocol": "http",
 					"host": [
-						"20",
-						"242",
-						"168",
-						"228"
+						"localhost"
 					],
 					"port": "82",
 					"path": [
@@ -1031,13 +998,10 @@
 					}
 				],
 				"url": {
-					"raw": "http://20.242.168.228:82/available-slots/{{FIRST_WORK}}",
+					"raw": "http://localhost:82/available-slots/{{FIRST_WORK}}",
 					"protocol": "http",
 					"host": [
-						"20",
-						"242",
-						"168",
-						"228"
+						"localhost"
 					],
 					"port": "82",
 					"path": [
