@@ -1,7 +1,7 @@
 {
 	"info": {
 		"_postman_id": "68c09e72-7cb8-4b2d-977c-a2c66e583482",
-		"name": "IDP proiect",
+		"name": "CC proiect",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
 		"_exporter_id": "20907152"
 	},
@@ -117,15 +117,12 @@
 					}
 				},
 				"url": {
-					"raw": "http://20.242.168.228:81/register",
+					"raw": "http://auth-reservation-app.com/register",
 					"protocol": "http",
 					"host": [
-						"20",
-						"242",
-						"168",
-						"228"
+						"auth-reservation-app",
+						"com"
 					],
-					"port": "81",
 					"path": [
 						"register"
 					]
@@ -185,15 +182,12 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "http://20.242.168.228:81/users",
+					"raw": "http://auth-reservation-app.com/users",
 					"protocol": "http",
 					"host": [
-						"20",
-						"242",
-						"168",
-						"228"
+						"auth-reservation-app",
+						"com"
 					],
-					"port": "81",
 					"path": [
 						"users"
 					]
@@ -257,15 +251,12 @@
 					}
 				},
 				"url": {
-					"raw": "http://20.242.168.228:81/login",
+					"raw": "http://auth-reservation-app.com/login",
 					"protocol": "http",
 					"host": [
-						"20",
-						"242",
-						"168",
-						"228"
+						"auth-reservation-app",
+						"com"
 					],
-					"port": "81",
 					"path": [
 						"login"
 					]
@@ -325,15 +316,12 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "http://20.242.168.228:81/users",
+					"raw": "http://auth-reservation-app.com/users",
 					"protocol": "http",
 					"host": [
-						"20",
-						"242",
-						"168",
-						"228"
+						"auth-reservation-app",
+						"com"
 					],
-					"port": "81",
 					"path": [
 						"users"
 					]
@@ -380,15 +368,12 @@
 				"method": "DELETE",
 				"header": [],
 				"url": {
-					"raw": "http://20.242.168.228:81/logout/{{TOKEN}}",
+					"raw": "http://auth-reservation-app.com/logout/{{TOKEN}}",
 					"protocol": "http",
 					"host": [
-						"20",
-						"242",
-						"168",
-						"228"
+						"auth-reservation-app",
+						"com"
 					],
-					"port": "81",
 					"path": [
 						"logout",
 						"{{TOKEN}}"
@@ -449,15 +434,12 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "http://20.242.168.228:81/users",
+					"raw": "http://auth-reservation-app.com/users",
 					"protocol": "http",
 					"host": [
-						"20",
-						"242",
-						"168",
-						"228"
+						"auth-reservation-app",
+						"com"
 					],
-					"port": "81",
 					"path": [
 						"users"
 					]
@@ -521,15 +503,12 @@
 					}
 				},
 				"url": {
-					"raw": "http://20.242.168.228:81/login",
+					"raw": "http://auth-reservation-app.com/login",
 					"protocol": "http",
 					"host": [
-						"20",
-						"242",
-						"168",
-						"228"
+						"auth-reservation-app",
+						"com"
 					],
-					"port": "81",
 					"path": [
 						"login"
 					]
@@ -642,15 +621,12 @@
 					}
 				},
 				"url": {
-					"raw": "http://20.242.168.228:82/workspace",
+					"raw": "http://backend-reservation-app.com/workspace",
 					"protocol": "http",
 					"host": [
-						"20",
-						"242",
-						"168",
-						"228"
+						"backend-reservation-app",
+						"com"
 					],
-					"port": "82",
 					"path": [
 						"workspace"
 					],
@@ -723,15 +699,12 @@
 					}
 				],
 				"url": {
-					"raw": "http://20.242.168.228:82/workspaces",
+					"raw": "http://backend-reservation-app.com/workspaces",
 					"protocol": "http",
 					"host": [
-						"20",
-						"242",
-						"168",
-						"228"
+						"backend-reservation-app",
+						"com"
 					],
-					"port": "82",
 					"path": [
 						"workspaces"
 					]
@@ -869,15 +842,12 @@
 					}
 				},
 				"url": {
-					"raw": "http://20.242.168.228:82/reservation",
+					"raw": "http://backend-reservation-app.com/reservation",
 					"protocol": "http",
 					"host": [
-						"20",
-						"242",
-						"168",
-						"228"
+						"backend-reservation-app",
+						"com"
 					],
-					"port": "82",
 					"path": [
 						"reservation"
 					],
@@ -954,15 +924,12 @@
 					}
 				],
 				"url": {
-					"raw": "http://20.242.168.228:82/reservations/{{FIRST_USER}}",
+					"raw": "http://backend-reservation-app.com/reservations/{{FIRST_USER}}",
 					"protocol": "http",
 					"host": [
-						"20",
-						"242",
-						"168",
-						"228"
+						"backend-reservation-app",
+						"com"
 					],
-					"port": "82",
 					"path": [
 						"reservations",
 						"{{FIRST_USER}}"
@@ -1031,15 +998,12 @@
 					}
 				],
 				"url": {
-					"raw": "http://20.242.168.228:82/available-slots/{{FIRST_WORK}}",
+					"raw": "http://backend-reservation-app.com/available-slots/{{FIRST_WORK}}",
 					"protocol": "http",
 					"host": [
-						"20",
-						"242",
-						"168",
-						"228"
+						"backend-reservation-app",
+						"com"
 					],
-					"port": "82",
 					"path": [
 						"available-slots",
 						"{{FIRST_WORK}}"

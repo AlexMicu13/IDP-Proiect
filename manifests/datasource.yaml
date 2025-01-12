@@ -1,0 +1,33 @@
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: my-grafana-datasources
+  namespace: grafana
+data:
+  datasource.yaml: |-
+    {
+      "apiVersion": 1,
+      "datasources": [
+        {
+          "name": "Postgres",
+          "isDefault": true,
+          "type": "postgres",
+          "url": "postgres-service.database.svc.cluster.local:5432",
+          "user": "postgres",
+          "secureJsonData": {
+            "password": "postgres"
+          },
+          "jsonData": {
+            "database": "database",
+            "sslmode": "disable",
+            "maxOpenConns": 100,
+            "maxIdleConns": 100,
+            "maxIdleConnsAuto": true,
+            "connMaxLifetime": 14400,
+            "postgresVersion": 1000,
+            "timescaledb": false
+          }
+        }
+      ]
+    }

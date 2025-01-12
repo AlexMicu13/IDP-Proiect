@@ -1,22 +1,23 @@
+# Deployments (Separate each service into its namespace)
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: python-api
-  namespace: default
+  name: auth-api
+  namespace: auth
   labels:
-    app:  python-api
+    app: auth-api
 spec:
+  replicas: 1
   selector:
     matchLabels:
-      app: python-api
-  replicas: 1
+      app: auth-api
   template:
     metadata:
       labels:
-        app:  python-api
+        app: auth-api
     spec:
       containers:
-      - name:  python-api
+      - name: auth-api
         image: amicutzu/reservation-app:auth
         resources:
           requests:
@@ -26,8 +27,27 @@ spec:
             cpu: 200m
             memory: 256Mi
         ports:
-        - containerPort:  81
-      - name:  backend-api
+        - containerPort: 81
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend-api
+  namespace: backend
+  labels:
+    app: backend-api
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: backend-api
+  template:
+    metadata:
+      labels:
+        app: backend-api
+    spec:
+      containers:
+      - name: backend-api
         image: amicutzu/reservation-app:backend
         resources:
           requests:
@@ -37,23 +57,75 @@ spec:
             cpu: 200m
             memory: 256Mi
         ports:
-        - containerPort:  82
-
+        - containerPort: 82
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: postgres
+  namespace: database
+  labels:
+    app: postgres
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: postgres
+  template:
+    metadata:
+      labels:
+        app: postgres
+    spec:
+      securityContext:
+        fsGroup: 999 
+      containers:
       - name: postgres
-        image: amicutzu/reservation-app:db
-        ports:
-        - containerPort: 5432
+        image: postgres:latest
         env:
         - name: POSTGRES_USER
-          value: "postgres"
+          value: postgres
         - name: POSTGRES_PASSWORD
-          value: "postgres"
+          value: postgres
         - name: POSTGRES_DB
-          value: "database"
+          value: database
+        ports:
+        - containerPort: 5432
         volumeMounts:
-        - mountPath: /var/lib/postgresql/data
-          name: postgres-data
-
+        - name: postgres-data
+          mountPath: /var/lib/postgresql/data
+          subPath: database
+        - name: postgres-init
+          mountPath: /docker-entrypoint-initdb.d
+      volumes:
+      - name: postgres-data
+        persistentVolumeClaim:
+          claimName: postgres-pvc
+      - name: postgres-init
+        configMap:
+          name: postgres-init
+          defaultMode: 420
+---
+# Grafana Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: grafana
+  namespace: grafana
+  labels:
+    app: grafana
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: grafana
+  template:
+    metadata:
+      labels:
+        app: grafana
+    spec:
+      securityContext:
+        fsGroup: 472 
+      containers:
       - name: grafana
         image: amicutzu/reservation-app:grafana
         ports:
@@ -66,106 +138,89 @@ spec:
         volumeMounts:
         - name: grafana-data
           mountPath: /var/lib/grafana
-        - name: grafana-provisioning
-          mountPath: /etc/grafana/provisioning
+        - name: grafana-datasources
+          mountPath: /etc/grafana/provisioning/datasources
           readOnly: false
-
-
-      - name: io
-        image: amicutzu/reservation-app:io
-        ports:
-        - containerPort: 83
-
-      - name: prometheus
-        image: amicutzu/reservation-app:prometheus
-        ports:
-        - containerPort: 9090
-
-      - name: portainer
-        image: portainer/portainer-ce:latest
-        ports:
-        - containerPort: 9443  # HTTPS Port
-        - containerPort: 9000  # HTTP
-        volumeMounts:
-        - name: portainer-data
-          mountPath: /data
-
+        - name: grafana-dashboards
+          mountPath: /var/lib/grafana/dashboards
+          readOnly: false
+        - name: grafana-dashboard-config
+          mountPath: /etc/grafana/provisioning/dashboards
+      volumes:
+      - name: grafana-data
+        persistentVolumeClaim:
+          claimName: grafana-data-pvc
+      - name: grafana-datasources
+        configMap:
+          name: my-grafana-datasources
+          defaultMode: 420
+      - name: grafana-dashboards
+        configMap:
+          name: my-grafana-dashboards
+          defaultMode: 420
+      - name: grafana-dashboard-config
+        configMap:
+          name: grafana-dashboard
+          defaultMode: 420
+---
+# pgAdmin Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pgadmin
+  namespace: pgadmin
+  labels:
+    app: pgadmin
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: pgadmin
+  template:
+    metadata:
+      labels:
+        app: pgadmin
+    spec:
+      containers:
       - name: pgadmin
         image: dpage/pgadmin4
         ports:
-        - containerPort: 80  # Internal port for pgAdmin
+        - containerPort: 80
         env:
         - name: PGADMIN_DEFAULT_EMAIL
           value: your_email@example.com
         - name: PGADMIN_DEFAULT_PASSWORD
           value: your_password
         - name: PGADMIN_CONFIG_ENHANCED_COOKIE_PROTECTION
-          value: False
-
+          value: 'False'
+---
+# Portainer Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: portainer
+  namespace: portainer
+  labels:
+    app: portainer
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: portainer
+  template:
+    metadata:
+      labels:
+        app: portainer
+    spec:
+      containers:
+      - name: portainer
+        image: portainer/portainer-ce
+        ports:
+        - containerPort: 9000
+        volumeMounts:
+        - name: portainer-data
+          mountPath: /data
       volumes:
-      - name: grafana-data
-        persistentVolumeClaim:
-          claimName: grafana-data-pvc
-      - name: grafana-provisioning
-        persistentVolumeClaim:
-          claimName: grafana-provisioning-pvc
-      - name: postgres-data
-        persistentVolumeClaim:
-          claimName: postgres-pvc
-      - name: docker-sock
-        hostPath:
-          path: /var/run/docker.sock
-          type: Socket
       - name: portainer-data
         persistentVolumeClaim:
           claimName: portainer-pvc
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: python-api-service
-  namespace: default
-spec:
-  selector:
-    app: python-api
-  type: LoadBalancer
-  ports:
-  # AUTH SERVICE
-  - name: auth
-    protocol: TCP
-    port: 81
-    targetPort: 81
-    nodePort: 31000
-  # BACKEND API
-  - name: backend
-    protocol: TCP
-    port: 82
-    targetPort: 82
-    nodePort: 32000
-  # IO SERVICE
-  - name: io
-    protocol: TCP
-    port: 83
-    targetPort: 83
-    nodePort: 31500
-  # PROMETHEUS
-  - name: prometheus
-    protocol: TCP
-    port: 9090       # External port
-    targetPort: 9090 # Prometheus container port
-  # PORTAINER
-  - name: portainer
-    port: 9000
-    targetPort: 9000
-    nodePort: 31005  # Accessible on Minikube
-  # PGADMIN
-  - name: pgadmin
-    protocol: TCP
-    port: 5050       # External port
-    targetPort: 80   # Port inside the container
-    nodePort: 31050  # Fixed NodePort for consistency
-  - name: grafana
-    protocol: TCP
-    port: 80           # External port to expose Grafana
-    targetPort: 3000
-    nodePort: 30555

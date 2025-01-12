@@ -9,7 +9,7 @@ def connect_to_db():
         dbname="database",
         user="postgres",
         password="postgres",
-        host="localhost",
+        host="postgres-service.database.svc.cluster.local",
         port=5432
     )
     return conn

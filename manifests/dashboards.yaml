@@ -1,0 +1,720 @@
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: my-grafana-dashboards
+  namespace: grafana
+data:
+  reservationdashboard.json: |-
+    {
+      "annotations": {
+        "list": [
+          {
+            "builtIn": 1,
+            "datasource": {
+              "type": "grafana",
+              "uid": "-- Grafana --"
+            },
+            "enable": true,
+            "hide": true,
+            "iconColor": "rgba(0, 211, 255, 1)",
+            "name": "Annotations & Alerts",
+            "type": "dashboard"
+          }
+        ]
+      },
+      "editable": true,
+      "fiscalYearStartMonth": 0,
+      "graphTooltip": 0,
+      "id": 3,
+      "links": [],
+      "panels": [
+        {
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "P44368ADAD746BC27"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "continuous-GrYlRd"
+              },
+              "mappings": [
+                {
+                  "options": {
+                    "0": {
+                      "index": 1,
+                      "text": "NOT BUSY"
+                    },
+                    "1": {
+                      "index": 0,
+                      "text": "BUSY"
+                    }
+                  },
+                  "type": "value"
+                }
+              ],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              }
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 7,
+            "w": 24,
+            "x": 0,
+            "y": 0
+          },
+          "id": 2,
+          "options": {
+            "displayMode": "gradient",
+            "maxVizHeight": 300,
+            "minVizHeight": 16,
+            "minVizWidth": 8,
+            "namePlacement": "auto",
+            "orientation": "vertical",
+            "reduceOptions": {
+              "calcs": [],
+              "fields": "/^busy_on_day$/",
+              "values": true
+            },
+            "showUnfilled": true,
+            "sizing": "auto",
+            "valueMode": "text"
+          },
+          "pluginVersion": "10.4.2",
+          "targets": [
+            {
+              "datasource": {
+                "type": "grafana-postgresql-datasource",
+                "uid": "P44368ADAD746BC27"
+              },
+              "editorMode": "code",
+              "format": "table",
+              "rawQuery": true,
+              "rawSql": "SELECT \r\n    u.username,\r\n    '2024-05-13' AS reservation_date,\r\n    CASE WHEN r.reservation_id IS NOT NULL THEN 0 ELSE 1 END AS busy_on_day\r\nFROM \r\n    Users u\r\nLEFT JOIN \r\n    Reservations r ON u.user_id = r.user_id AND r.reservation_date = '2024-05-13'\r\nORDER BY \r\n    u.username;\r\n",
+              "refId": "A",
+              "sql": {
+                "columns": [
+                  {
+                    "parameters": [],
+                    "type": "function"
+                  }
+                ],
+                "groupBy": [
+                  {
+                    "property": {
+                      "type": "string"
+                    },
+                    "type": "groupBy"
+                  }
+                ],
+                "limit": 50
+              }
+            }
+          ],
+          "title": "Users busy on date",
+          "type": "bargauge"
+        },
+        {
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "P44368ADAD746BC27"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "thresholds"
+              },
+              "custom": {
+                "align": "auto",
+                "cellOptions": {
+                  "type": "auto"
+                },
+                "inspect": false
+              },
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              }
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 9,
+            "w": 24,
+            "x": 0,
+            "y": 7
+          },
+          "id": 1,
+          "options": {
+            "cellHeight": "sm",
+            "footer": {
+              "countRows": false,
+              "fields": "",
+              "reducer": [
+                "sum"
+              ],
+              "show": false
+            },
+            "showHeader": true
+          },
+          "pluginVersion": "10.4.2",
+          "targets": [
+            {
+              "datasource": {
+                "type": "grafana-postgresql-datasource",
+                "uid": "P44368ADAD746BC27"
+              },
+              "editorMode": "code",
+              "format": "table",
+              "rawQuery": true,
+              "rawSql": "SELECT workspace_id, user_id, reservation_date, start_time, end_time FROM (SELECT * FROM reservations ORDER BY reservation_date, start_time, end_time); ",
+              "refId": "A",
+              "sql": {
+                "columns": [
+                  {
+                    "parameters": [],
+                    "type": "function"
+                  }
+                ],
+                "groupBy": [
+                  {
+                    "property": {
+                      "type": "string"
+                    },
+                    "type": "groupBy"
+                  }
+                ],
+                "limit": 50
+              },
+              "table": "reservations"
+            }
+          ],
+          "title": "Reservations",
+          "type": "table"
+        }
+      ],
+      "schemaVersion": 39,
+      "tags": [],
+      "templating": {
+        "list": []
+      },
+      "time": {
+        "from": "now-6h",
+        "to": "now"
+      },
+      "timepicker": {},
+      "timezone": "browser",
+      "title": "Reservations Dashboard",
+      "uid": "adlf15d56q70ga",
+      "version": 3,
+      "weekStart": ""
+    }
+  usersdashboard.json: |-
+    {
+      "annotations": {
+          "list": [
+              {
+                  "builtIn": 1,
+                  "datasource": {
+                      "type": "grafana",
+                      "uid": "-- Grafana --"
+                  },
+                  "enable": true,
+                  "hide": true,
+                  "iconColor": "rgba(0, 211, 255, 1)",
+                  "name": "Annotations & Alerts",
+                  "type": "dashboard"
+              }
+          ]
+      },
+      "editable": true,
+      "fiscalYearStartMonth": 0,
+      "graphTooltip": 0,
+      "id": 1,
+      "links": [],
+      "panels": [
+          {
+              "datasource": {
+                  "type": "grafana-postgresql-datasource",
+                  "uid": "P44368ADAD746BC27"
+              },
+              "fieldConfig": {
+                  "defaults": {
+                      "color": {
+                          "mode": "palette-classic"
+                      },
+                      "custom": {
+                          "axisBorderShow": false,
+                          "axisCenteredZero": false,
+                          "axisColorMode": "text",
+                          "axisLabel": "",
+                          "axisPlacement": "auto",
+                          "fillOpacity": 80,
+                          "gradientMode": "none",
+                          "hideFrom": {
+                              "legend": false,
+                              "tooltip": false,
+                              "viz": false
+                          },
+                          "lineWidth": 1,
+                          "scaleDistribution": {
+                              "type": "linear"
+                          },
+                          "thresholdsStyle": {
+                              "mode": "off"
+                          }
+                      },
+                      "mappings": [],
+                      "thresholds": {
+                          "mode": "absolute",
+                          "steps": [
+                              {
+                                  "color": "green",
+                                  "value": null
+                              },
+                              {
+                                  "color": "red",
+                                  "value": 80
+                              }
+                          ]
+                      }
+                  },
+                  "overrides": []
+              },
+              "gridPos": {
+                  "h": 8,
+                  "w": 24,
+                  "x": 0,
+                  "y": 0
+              },
+              "id": 1,
+              "options": {
+                  "barRadius": 0,
+                  "barWidth": 0.97,
+                  "fullHighlight": false,
+                  "groupWidth": 0.7,
+                  "legend": {
+                      "calcs": [],
+                      "displayMode": "list",
+                      "placement": "bottom",
+                      "showLegend": true
+                  },
+                  "orientation": "auto",
+                  "showValue": "auto",
+                  "stacking": "none",
+                  "tooltip": {
+                      "mode": "single",
+                      "sort": "none"
+                  },
+                  "xTickLabelRotation": 0,
+                  "xTickLabelSpacing": 0
+              },
+              "pluginVersion": "10.4.2",
+              "targets": [
+                  {
+                      "datasource": {
+                          "type": "grafana-postgresql-datasource",
+                          "uid": "P44368ADAD746BC27"
+                      },
+                      "editorMode": "code",
+                      "format": "table",
+                      "rawQuery": true,
+                      "rawSql": "SELECT \r\n    DATE_TRUNC('minute', created_at) AS minute,\r\n    SUM(COUNT(*)) OVER (ORDER BY DATE_TRUNC('minute', created_at)) AS registered_users,\r\n    SUM(COUNT(token)) OVER (ORDER BY DATE_TRUNC('minute', created_at)) AS logged_in_users\r\nFROM Users\r\nGROUP BY DATE_TRUNC('minute', created_at)\r\nORDER BY minute;\r\n",
+                      "refId": "A",
+                      "sql": {
+                          "columns": [
+                              {
+                                  "parameters": [
+                                      {
+                                          "name": "created_at",
+                                          "type": "functionParameter"
+                                      }
+                                  ],
+                                  "type": "function"
+                              }
+                          ],
+                          "groupBy": [
+                              {
+                                  "property": {
+                                      "type": "string"
+                                  },
+                                  "type": "groupBy"
+                              }
+                          ],
+                          "limit": 50
+                      },
+                      "table": "users"
+                  }
+              ],
+              "title": "Registered and Logged In Users",
+              "type": "barchart"
+          },
+          {
+              "datasource": {
+                  "type": "grafana-postgresql-datasource",
+                  "uid": "P44368ADAD746BC27"
+              },
+              "fieldConfig": {
+                  "defaults": {
+                      "color": {
+                          "mode": "thresholds"
+                      },
+                      "custom": {
+                          "align": "auto",
+                          "cellOptions": {
+                              "type": "auto"
+                          },
+                          "inspect": false
+                      },
+                      "mappings": [],
+                      "thresholds": {
+                          "mode": "absolute",
+                          "steps": [
+                              {
+                                  "color": "green",
+                                  "value": null
+                              },
+                              {
+                                  "color": "red",
+                                  "value": 80
+                              }
+                          ]
+                      }
+                  },
+                  "overrides": []
+              },
+              "gridPos": {
+                  "h": 8,
+                  "w": 24,
+                  "x": 0,
+                  "y": 8
+              },
+              "id": 2,
+              "options": {
+                  "cellHeight": "sm",
+                  "footer": {
+                      "countRows": false,
+                      "fields": "",
+                      "reducer": [
+                          "sum"
+                      ],
+                      "show": false
+                  },
+                  "showHeader": true
+              },
+              "pluginVersion": "10.4.2",
+              "targets": [
+                  {
+                      "datasource": {
+                          "type": "grafana-postgresql-datasource",
+                          "uid": "P44368ADAD746BC27"
+                      },
+                      "editorMode": "code",
+                      "format": "table",
+                      "rawQuery": true,
+                      "rawSql": "SELECT * FROM users  ",
+                      "refId": "A",
+                      "sql": {
+                          "columns": [
+                              {
+                                  "parameters": [],
+                                  "type": "function"
+                              }
+                          ],
+                          "groupBy": [
+                              {
+                                  "property": {
+                                      "type": "string"
+                                  },
+                                  "type": "groupBy"
+                              }
+                          ],
+                          "limit": 50
+                      }
+                  }
+              ],
+              "title": "Users Table",
+              "type": "table"
+          }
+      ],
+      "schemaVersion": 39,
+      "tags": [],
+      "templating": {
+          "list": []
+      },
+      "time": {
+          "from": "now-6h",
+          "to": "now"
+      },
+      "timepicker": {},
+      "timezone": "browser",
+      "title": "Users overview",
+      "uid": "bdleyj6gdl9fka",
+      "version": 6,
+      "weekStart": ""
+    }
+  workspacesdashboard.json: |-
+    {
+      "annotations": {
+          "list": [
+              {
+                  "builtIn": 1,
+                  "datasource": {
+                      "type": "grafana",
+                      "uid": "-- Grafana --"
+                  },
+                  "enable": true,
+                  "hide": true,
+                  "iconColor": "rgba(0, 211, 255, 1)",
+                  "name": "Annotations & Alerts",
+                  "type": "dashboard"
+              }
+          ]
+      },
+      "editable": true,
+      "fiscalYearStartMonth": 0,
+      "graphTooltip": 0,
+      "id": 2,
+      "links": [],
+      "panels": [
+          {
+              "datasource": {
+                  "type": "grafana-postgresql-datasource",
+                  "uid": "P44368ADAD746BC27"
+              },
+              "fieldConfig": {
+                  "defaults": {
+                      "color": {
+                          "mode": "thresholds"
+                      },
+                      "custom": {
+                          "align": "auto",
+                          "cellOptions": {
+                              "type": "auto"
+                          },
+                          "inspect": false
+                      },
+                      "mappings": [],
+                      "thresholds": {
+                          "mode": "absolute",
+                          "steps": [
+                              {
+                                  "color": "green",
+                                  "value": null
+                              },
+                              {
+                                  "color": "red",
+                                  "value": 80
+                              }
+                          ]
+                      }
+                  },
+                  "overrides": []
+              },
+              "gridPos": {
+                  "h": 7,
+                  "w": 24,
+                  "x": 0,
+                  "y": 0
+              },
+              "id": 2,
+              "options": {
+                  "cellHeight": "sm",
+                  "footer": {
+                      "countRows": false,
+                      "fields": "",
+                      "reducer": [
+                          "sum"
+                      ],
+                      "show": false
+                  },
+                  "showHeader": true
+              },
+              "pluginVersion": "10.4.2",
+              "targets": [
+                  {
+                      "datasource": {
+                          "type": "grafana-postgresql-datasource",
+                          "uid": "P44368ADAD746BC27"
+                      },
+                      "editorMode": "code",
+                      "format": "table",
+                      "rawQuery": true,
+                      "rawSql": "SELECT workspace_name, capacity, location, description\r\nFROM Workspaces\r\nGROUP BY location, description, workspace_name, capacity\r\nORDER BY location, description, capacity;\r\n\r\n",
+                      "refId": "A",
+                      "sql": {
+                          "columns": [
+                              {
+                                  "parameters": [],
+                                  "type": "function"
+                              }
+                          ],
+                          "groupBy": [
+                              {
+                                  "property": {
+                                      "type": "string"
+                                  },
+                                  "type": "groupBy"
+                              }
+                          ],
+                          "limit": 50
+                      }
+                  }
+              ],
+              "title": "All Workspaces",
+              "type": "table"
+          },
+          {
+              "datasource": {
+                  "type": "grafana-postgresql-datasource",
+                  "uid": "P44368ADAD746BC27"
+              },
+              "fieldConfig": {
+                  "defaults": {
+                      "color": {
+                          "mode": "palette-classic"
+                      },
+                      "custom": {
+                          "axisBorderShow": false,
+                          "axisCenteredZero": false,
+                          "axisColorMode": "text",
+                          "axisLabel": "",
+                          "axisPlacement": "auto",
+                          "fillOpacity": 80,
+                          "gradientMode": "none",
+                          "hideFrom": {
+                              "legend": false,
+                              "tooltip": false,
+                              "viz": false
+                          },
+                          "lineWidth": 1,
+                          "scaleDistribution": {
+                              "type": "linear"
+                          },
+                          "thresholdsStyle": {
+                              "mode": "off"
+                          }
+                      },
+                      "mappings": [],
+                      "thresholds": {
+                          "mode": "absolute",
+                          "steps": [
+                              {
+                                  "color": "green",
+                                  "value": null
+                              },
+                              {
+                                  "color": "red",
+                                  "value": 80
+                              }
+                          ]
+                      },
+                      "unit": "short"
+                  },
+                  "overrides": []
+              },
+              "gridPos": {
+                  "h": 9,
+                  "w": 24,
+                  "x": 0,
+                  "y": 7
+              },
+              "id": 1,
+              "options": {
+                  "barRadius": 0,
+                  "barWidth": 0.97,
+                  "fullHighlight": false,
+                  "groupWidth": 0.7,
+                  "legend": {
+                      "calcs": [],
+                      "displayMode": "list",
+                      "placement": "right",
+                      "showLegend": true
+                  },
+                  "orientation": "auto",
+                  "showValue": "never",
+                  "stacking": "none",
+                  "tooltip": {
+                      "mode": "single",
+                      "sort": "none"
+                  },
+                  "xTickLabelRotation": 0,
+                  "xTickLabelSpacing": 0
+              },
+              "pluginVersion": "10.4.2",
+              "targets": [
+                  {
+                      "datasource": {
+                          "type": "grafana-postgresql-datasource",
+                          "uid": "P44368ADAD746BC27"
+                      },
+                      "editorMode": "code",
+                      "format": "table",
+                      "rawQuery": true,
+                      "rawSql": "SELECT workspace_name, capacity\r\nFROM Workspaces\r\nORDER BY capacity;\r\n",
+                      "refId": "A",
+                      "sql": {
+                          "columns": [
+                              {
+                                  "parameters": [],
+                                  "type": "function"
+                              }
+                          ],
+                          "groupBy": [
+                              {
+                                  "property": {
+                                      "type": "string"
+                                  },
+                                  "type": "groupBy"
+                              }
+                          ],
+                          "limit": 50
+                      },
+                      "table": "workspaces"
+                  }
+              ],
+              "title": "Capacity of every workspace",
+              "type": "barchart"
+          }
+      ],
+      "schemaVersion": 39,
+      "tags": [],
+      "templating": {
+          "list": []
+      },
+      "time": {
+          "from": "now-6h",
+          "to": "now"
+      },
+      "timepicker": {},
+      "timezone": "browser",
+      "title": "Workspaces Dashboard",
+      "uid": "fdlezm1jy6f40a",
+      "version": 3,
+      "weekStart": ""
+    }
+
+
