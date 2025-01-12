@@ -1,9 +1,9 @@
 {
 	"info": {
-		"_postman_id": "d458073f-8dfb-4910-a53b-03e216b90e9e",
-		"name": "IDP proiect",
+		"_postman_id": "68c09e72-7cb8-4b2d-977c-a2c66e583482",
+		"name": "CC proiect",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-		"_exporter_id": "31060986"
+		"_exporter_id": "20907152"
 	},
 	"item": [
 		{
@@ -117,17 +117,13 @@
 					}
 				},
 				"url": {
-					"raw": "http://172.27.209.195:80/auth/register",
+					"raw": "http://auth-reservation-app.com/register",
 					"protocol": "http",
 					"host": [
-						"172",
-						"27",
-						"209",
-						"195"
+						"auth-reservation-app",
+						"com"
 					],
-					"port": "80",
 					"path": [
-						"auth",
 						"register"
 					]
 				}
@@ -186,17 +182,13 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "http://172.27.209.195:80/auth/users",
+					"raw": "http://auth-reservation-app.com/users",
 					"protocol": "http",
 					"host": [
-						"172",
-						"27",
-						"209",
-						"195"
+						"auth-reservation-app",
+						"com"
 					],
-					"port": "80",
 					"path": [
-						"auth",
 						"users"
 					]
 				}
@@ -259,17 +251,13 @@
 					}
 				},
 				"url": {
-					"raw": "http://172.27.209.195:80/auth/login",
+					"raw": "http://auth-reservation-app.com/login",
 					"protocol": "http",
 					"host": [
-						"172",
-						"27",
-						"209",
-						"195"
+						"auth-reservation-app",
+						"com"
 					],
-					"port": "80",
 					"path": [
-						"auth",
 						"login"
 					]
 				}
@@ -328,17 +316,13 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "http://172.27.209.195:80/auth/users",
+					"raw": "http://auth-reservation-app.com/users",
 					"protocol": "http",
 					"host": [
-						"172",
-						"27",
-						"209",
-						"195"
+						"auth-reservation-app",
+						"com"
 					],
-					"port": "80",
 					"path": [
-						"auth",
 						"users"
 					]
 				}
@@ -384,17 +368,13 @@
 				"method": "DELETE",
 				"header": [],
 				"url": {
-					"raw": "http://172.27.209.195:80/auth/logout/{{TOKEN}}",
+					"raw": "http://auth-reservation-app.com/logout/{{TOKEN}}",
 					"protocol": "http",
 					"host": [
-						"172",
-						"27",
-						"209",
-						"195"
+						"auth-reservation-app",
+						"com"
 					],
-					"port": "80",
 					"path": [
-						"auth",
 						"logout",
 						"{{TOKEN}}"
 					]
@@ -454,17 +434,13 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "http://172.27.209.195:80/auth/users",
+					"raw": "http://auth-reservation-app.com/users",
 					"protocol": "http",
 					"host": [
-						"172",
-						"27",
-						"209",
-						"195"
+						"auth-reservation-app",
+						"com"
 					],
-					"port": "80",
 					"path": [
-						"auth",
 						"users"
 					]
 				}
@@ -472,7 +448,7 @@
 			"response": []
 		},
 		{
-			"name": "Login user1",
+			"name": "Login first user",
 			"event": [
 				{
 					"listen": "test",
@@ -527,17 +503,13 @@
 					}
 				},
 				"url": {
-					"raw": "http://172.27.209.195:80/auth/login",
+					"raw": "http://auth-reservation-app.com/login",
 					"protocol": "http",
 					"host": [
-						"172",
-						"27",
-						"209",
-						"195"
+						"auth-reservation-app",
+						"com"
 					],
-					"port": "80",
 					"path": [
-						"auth",
 						"login"
 					]
 				}
@@ -649,17 +621,13 @@
 					}
 				},
 				"url": {
-					"raw": "http://172.27.209.195:80/api/workspace",
+					"raw": "http://backend-reservation-app.com/workspace",
 					"protocol": "http",
 					"host": [
-						"172",
-						"27",
-						"209",
-						"195"
+						"backend-reservation-app",
+						"com"
 					],
-					"port": "80",
 					"path": [
-						"api",
 						"workspace"
 					],
 					"query": [
@@ -731,17 +699,13 @@
 					}
 				],
 				"url": {
-					"raw": "http://172.27.209.195:80/api/workspaces",
+					"raw": "http://backend-reservation-app.com/workspaces",
 					"protocol": "http",
 					"host": [
-						"172",
-						"27",
-						"209",
-						"195"
+						"backend-reservation-app",
+						"com"
 					],
-					"port": "80",
 					"path": [
-						"api",
 						"workspaces"
 					]
 				}
@@ -755,26 +719,55 @@
 					"listen": "prerequest",
 					"script": {
 						"exec": [
+							"const formatDate = (date, time) => {\r",
+							"  const year = date.getFullYear();\r",
+							"  const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are 0-based\r",
+							"  const day = String(date.getDate()).padStart(2, '0');\r",
+							"  const hours = String(date.getHours()).padStart(2, '0');\r",
+							"  const minutes = String(date.getMinutes()).padStart(2, '0');\r",
+							"  const seconds = String(date.getSeconds()).padStart(2, '0');\r",
+							"\r",
+							"  if (time === true)\r",
+							"    return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;\r",
+							"  return `${year}-${month}-${day}`;\r",
+							"};\r",
+							"\r",
 							"let initialized = pm.variables.get(\"ADD_RESERVATION_INIT\");\r",
-							"console.log(initialized);\r",
 							"if (!initialized) {\r",
+							"    let firstUser = JSON.parse(pm.collectionVariables.get(\"USERS_IDS\") || \"[]\")[0];\r",
+							"    let firstWorkspace = JSON.parse(pm.collectionVariables.get(\"WORKSPACES_IDS\") || \"[]\")[0];\r",
+							"    console.log(initialized);\r",
+							"    console.log(firstWorkspace);\r",
+							"    console.log(firstUser);\r",
+							"    const now = new Date();\r",
+							"    const inFiveDays = new Date();\r",
+							"    inFiveDays.setDate(now.getDate() + 5);\r",
+							"    console.log(now);\r",
+							"    console.log(inFiveDays);\r",
+							"    const reservation_date1 = formatDate(new Date(now), false);\r",
+							"    const eightAm = formatDate(new Date(now.setHours(8, 0, 0, 0)), true);\r",
+							"    const tenNowAm = formatDate(new Date(now.setHours(10, 0, 0, 0)), true);\r",
+							"    const reservation_date2 = formatDate(new Date(now.setDate(now.getDate() + 5)), false);\r",
+							"    const tenLaterAm = formatDate(new Date(inFiveDays.setHours(10, 0, 0, 0)), true);\r",
+							"    const noon = formatDate(new Date(inFiveDays.setHours(12, 0, 0, 0)), true);\r",
 							"    const reservations = [\r",
 							"        {\r",
-							"            \"user_id\": 1,\r",
-							"            \"workspace_id\": 1,\r",
-							"            \"start_time\": \"2024-05-11 08:00:00\",\r",
-							"            \"end_time\": \"2024-05-11 10:00:00\",\r",
-							"            \"reservation_date\": \"2024-05-11\"\r",
+							"            \"user_id\": firstUser,\r",
+							"            \"workspace_id\": firstWorkspace,\r",
+							"            \"start_time\": eightAm,\r",
+							"            \"end_time\": tenNowAm,\r",
+							"            \"reservation_date\": reservation_date1\r",
 							"        },\r",
 							"        {\r",
-							"            \"user_id\": 1,\r",
-							"            \"workspace_id\": 1,\r",
-							"            \"start_time\": \"2024-05-16 10:00:00\",\r",
-							"            \"end_time\": \"2024-05-16 12:00:00\",\r",
-							"            \"reservation_date\": \"2024-05-16\"\r",
+							"            \"user_id\": firstUser,\r",
+							"            \"workspace_id\": firstWorkspace,\r",
+							"            \"start_time\": tenLaterAm,\r",
+							"            \"end_time\": noon,\r",
+							"            \"reservation_date\": reservation_date2\r",
 							"        }\r",
 							"    ];\r",
 							"    initialized = true;\r",
+							"    console.log(reservations);\r",
 							"    pm.variables.set(\"ADD_RESERVATION_INIT\", initialized);\r",
 							"    pm.variables.set(\"ADD_RESERVATION_DATASET\", JSON.stringify(reservations));\r",
 							"}\r",
@@ -849,17 +842,13 @@
 					}
 				},
 				"url": {
-					"raw": "http://172.27.209.195:80/api/reservation",
+					"raw": "http://backend-reservation-app.com/reservation",
 					"protocol": "http",
 					"host": [
-						"172",
-						"27",
-						"209",
-						"195"
+						"backend-reservation-app",
+						"com"
 					],
-					"port": "80",
 					"path": [
-						"api",
 						"reservation"
 					],
 					"query": [
@@ -874,7 +863,7 @@
 			"response": []
 		},
 		{
-			"name": "View user 1 reservations",
+			"name": "View first user reservations",
 			"event": [
 				{
 					"listen": "test",
@@ -913,6 +902,17 @@
 						"type": "text/javascript",
 						"packages": {}
 					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"let firstUser = JSON.parse(pm.collectionVariables.get(\"USERS_IDS\") || \"[]\")[0];\r",
+							"pm.collectionVariables.set(\"FIRST_USER\", firstUser)"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
 				}
 			],
 			"request": {
@@ -924,19 +924,89 @@
 					}
 				],
 				"url": {
-					"raw": "http://172.27.209.195:80/api/reservations/1",
+					"raw": "http://backend-reservation-app.com/reservations/{{FIRST_USER}}",
 					"protocol": "http",
 					"host": [
-						"172",
-						"27",
-						"209",
-						"195"
+						"backend-reservation-app",
+						"com"
 					],
-					"port": "80",
 					"path": [
-						"api",
 						"reservations",
-						"1"
+						"{{FIRST_USER}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "View first workspace's available slots",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"let firstWork = JSON.parse(pm.collectionVariables.get(\"WORKSPACES_IDS\") || \"[]\")[0];\r",
+							"pm.collectionVariables.set(\"FIRST_WORK\", firstWork)"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"const schema = {\r",
+							"    type: 'array',\r",
+							"    uniqueItems: true,\r",
+							"    minItems: 0,\r",
+							"    items: {\r",
+							"        type: 'object',\r",
+							"        properties: {\r",
+							"            start_time: {type: 'string'},\r",
+							"            end_time: {type: 'string'},\r",
+							"        },\r",
+							"        additionalProperties: false\r",
+							"    }\r",
+							"};\r",
+							"\r",
+							"pm.test(\"Body should either be empty or respect the schema\", () => {\r",
+							"    pm.response.to.have.status(200);\r",
+							"    const responseJSON = pm.response.json();\r",
+							"    pm.expect(responseJSON).to.be.an(\"array\");\r",
+							"\r",
+							"    pm.response.to.have.jsonSchema(schema);\r",
+							"\r",
+							"    console.log(pm.response.json());\r",
+							"    \r",
+							"});\r",
+							"\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "{{TOKEN}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "http://backend-reservation-app.com/available-slots/{{FIRST_WORK}}",
+					"protocol": "http",
+					"host": [
+						"backend-reservation-app",
+						"com"
+					],
+					"path": [
+						"available-slots",
+						"{{FIRST_WORK}}"
 					]
 				}
 			},
@@ -980,6 +1050,14 @@
 		},
 		{
 			"key": "WORKSPACES_IDS",
+			"value": ""
+		},
+		{
+			"key": "FIRST_USER",
+			"value": ""
+		},
+		{
+			"key": "FIRST_WORK",
 			"value": ""
 		}
 	]

@@ -1,0 +1,74 @@
+# Network Policy for Postgres (Database)
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-database-access
+  namespace: database
+spec:
+  podSelector:
+    matchLabels:
+      app: postgres
+  ingress:
+  - from:
+    - namespaceSelector:
+        matchLabels:
+          name: auth
+    - namespaceSelector:
+        matchLabels:
+          name: backend
+    - namespaceSelector:
+        matchLabels:
+          name: grafana
+    - namespaceSelector:
+        matchLabels:
+          name: pgadmin
+    ports:
+    - protocol: TCP
+      port: 5432
+---
+# Network Policy for Portainer (access to all namespaces)
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-portainer-access
+  namespace: portainer
+spec:
+  podSelector:
+    matchLabels:
+      app: portainer
+  ingress:
+  - from: []
+    ports:
+    - protocol: TCP
+      port: 9000
+---
+# Network Policy for Ingress (access to all namespaces)
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-ingress-access
+  namespace: ingress-nginx
+spec:
+  podSelector:
+    matchLabels:
+      app: app-ingress
+  ingress:
+  - from:
+    - namespaceSelector:
+        matchLabels:
+          name: auth
+    - namespaceSelector:
+        matchLabels:
+          name: backend
+    - namespaceSelector:
+        matchLabels:
+          name: grafana
+    - namespaceSelector:
+        matchLabels:
+          name: pgadmin
+    - namespaceSelector:
+        matchLabels:
+          name: portainer
+    ports:
+    - protocol: TCP
+      port: 80
